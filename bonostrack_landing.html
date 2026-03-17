@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bonostrack — El bono correcto. Por primera vez.</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ── PANTONE 2026: CLOUD DANCER PALETTE ───────────────────────── */
+:root{
+  /* Cloud Dancer 11-4201 = warm white */
+  --cloud:   #F5F2ED;
+  --cloud2:  #EDE8E0;
+  --cloud3:  #E0D9CE;
+  --ink:     #1C1917;
+  --ink2:    #2C2825;
+  --mid:     #7A7268;
+  --accent:  #8B2FC9;   /* bold purple — verdad auditable */
+  --red:     #C8202A;
+  --green:   #0F7C4A;
+  --gold:    #B07D2A;
+  --line:    rgba(28,25,23,.1);
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--cloud);
+  color:var(--ink);
+  font-size:15px;
+  overflow-x:hidden;
+}
+
+/* ── NOISE TEXTURE OVERLAY ────────────────────────────────────── */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:9999;opacity:.5;
+}
+
+/* ── NAV ───────────────────────────────────────────────────────── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:1.25rem 2.5rem;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(245,242,237,.92);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line);
+}
+.nav-logo{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.4rem;font-weight:600;letter-spacing:-.02em;color:var(--ink);
+  text-decoration:none;
+}
+.nav-logo span{color:var(--accent);}
+.nav-links{display:flex;align-items:center;gap:2rem;}
+.nav-links a{font-size:.82rem;font-weight:500;color:var(--mid);text-decoration:none;transition:.15s;letter-spacing:.02em;}
+.nav-links a:hover{color:var(--ink);}
+.nav-cta{
+  padding:8px 20px;border-radius:4px;
+  background:var(--ink);color:var(--cloud);
+  font-size:.8rem;font-weight:600;text-decoration:none;
+  transition:all .15s;letter-spacing:.03em;
+}
+.nav-cta:hover{background:var(--ink2);}
+
+/* ── HERO ──────────────────────────────────────────────────────── */
+.hero{
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:8rem 2rem 5rem;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+.hero-bg{
+  position:absolute;inset:0;z-index:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 80%, rgba(139,47,201,.06) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 20%, rgba(200,32,42,.04) 0%, transparent 60%),
+    radial-gradient(ellipse 100% 80% at 50% 50%, rgba(176,125,42,.03) 0%, transparent 70%);
+}
+.hero-eyebrow{
+  font-size:.72rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--mid);margin-bottom:1.5rem;
+  animation:fadeUp .8s ease both;
+}
+.hero-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(3.5rem,8vw,7rem);
+  font-weight:300;line-height:.95;
+  letter-spacing:-.03em;color:var(--ink);
+  margin-bottom:1rem;
+  animation:fadeUp .8s .1s ease both;
+}
+.hero-title em{
+  font-style:italic;font-weight:300;
+  color:var(--accent);
+}
+.hero-sub{
+  font-size:1.05rem;font-weight:300;color:var(--mid);
+  max-width:520px;line-height:1.7;margin-bottom:2.5rem;
+  animation:fadeUp .8s .2s ease both;
+}
+.hero-actions{
+  display:flex;gap:1rem;align-items:center;flex-wrap:wrap;justify-content:center;
+  animation:fadeUp .8s .3s ease both;
+}
+.btn-hero{
+  padding:14px 32px;border-radius:4px;font-size:.88rem;font-weight:600;
+  text-decoration:none;letter-spacing:.04em;transition:all .2s;
+  display:inline-flex;align-items:center;gap:8px;
+}
+.btn-hero.primary{background:var(--ink);color:var(--cloud);}
+.btn-hero.primary:hover{background:var(--ink2);transform:translateY(-1px);}
+.btn-hero.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line);}
+.btn-hero.ghost:hover{border-color:var(--ink);}
+
+/* STATS BAR */
+.stats-bar{
+  display:flex;gap:3rem;margin-top:4rem;padding-top:3rem;
+  border-top:1px solid var(--line);
+  animation:fadeUp .8s .4s ease both;
+  flex-wrap:wrap;justify-content:center;
+}
+.stat{text-align:center;}
+.stat-n{
+  font-family:'Cormorant Garamond',serif;
+  font-size:2.5rem;font-weight:600;letter-spacing:-.04em;color:var(--ink);line-height:1;
+}
+.stat-n .stat-neg{color:var(--red);}
+.stat-l{font-size:.72rem;font-weight:500;color:var(--mid);letter-spacing:.08em;text-transform:uppercase;margin-top:.3rem;}
+
+/* ── PROBLEM SECTION ───────────────────────────────────────────── */
+.section{padding:6rem 2rem;max-width:1100px;margin:0 auto;}
+.section-label{
+  font-size:.7rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--mid);margin-bottom:1rem;
+}
+.section-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(2rem,4vw,3.2rem);font-weight:400;
+  letter-spacing:-.02em;line-height:1.1;
+  margin-bottom:1.25rem;
+}
+.section-sub{font-size:.95rem;color:var(--mid);line-height:1.7;max-width:560px;}
+
+/* PROCESS FLOW */
+.flow{
+  display:grid;grid-template-columns:repeat(5,1fr);
+  gap:0;margin:3.5rem 0;
+  position:relative;
+}
+.flow::before{
+  content:'';position:absolute;
+  top:2rem;left:10%;right:10%;height:1px;
+  background:linear-gradient(90deg,transparent,var(--red),transparent);
+}
+.flow-step{
+  text-align:center;padding:0 .5rem;position:relative;
+}
+.flow-step-num{
+  width:40px;height:40px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto .75rem;
+  font-size:.8rem;font-weight:700;position:relative;z-index:1;
+}
+.flow-step-num.bad{background:#fde8e8;color:var(--red);border:1.5px solid var(--red);}
+.flow-step-num.ok{background:#e8f5ee;color:var(--green);border:1.5px solid var(--green);}
+.flow-step-label{font-size:.8rem;font-weight:600;margin-bottom:.25rem;color:var(--ink);}
+.flow-step-sub{font-size:.72rem;color:var(--mid);line-height:1.4;}
+.flow-step-sub.danger{color:var(--red);}
+.flow-arrow{
+  position:absolute;top:1.7rem;right:-12px;
+  font-size:.85rem;color:var(--mid);z-index:2;
+}
+
+/* ── HOW IT WORKS ──────────────────────────────────────────────── */
+.how-grid{
+  display:grid;grid-template-columns:1fr 1fr 1fr;
+  gap:1.5rem;margin-top:3rem;
+}
+.how-card{
+  background:var(--cloud2);border:1px solid var(--line);
+  border-radius:2px;padding:2rem;
+  position:relative;overflow:hidden;
+  transition:transform .2s;
+}
+.how-card:hover{transform:translateY(-3px);}
+.how-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+}
+.how-card.c1::before{background:var(--accent);}
+.how-card.c2::before{background:var(--red);}
+.how-card.c3::before{background:var(--green);}
+.how-num{
+  font-family:'Cormorant Garamond',serif;
+  font-size:3rem;font-weight:300;color:var(--line);
+  line-height:1;margin-bottom:.75rem;
+}
+.how-title{font-size:.95rem;font-weight:700;margin-bottom:.5rem;}
+.how-body{font-size:.82rem;color:var(--mid);line-height:1.6;}
+.how-tag{
+  display:inline-block;margin-top:.75rem;
+  font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  padding:3px 8px;border-radius:2px;
+}
+.how-card.c1 .how-tag{background:#f3e8ff;color:var(--accent);}
+.how-card.c2 .how-tag{background:#fde8e8;color:var(--red);}
+.how-card.c3 .how-tag{background:#e8f5ee;color:var(--green);}
+
+/* ── CONNECTORS ────────────────────────────────────────────────── */
+.connectors{
+  background:var(--ink);color:var(--cloud);
+  padding:5rem 2rem;margin:2rem 0;
+}
+.connectors-inner{max-width:1100px;margin:0 auto;}
+.conn-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:1px;background:rgba(255,255,255,.1);
+  margin-top:2.5rem;
+  border:1px solid rgba(255,255,255,.1);
+}
+.conn-item{
+  background:var(--ink);padding:1.5rem;
+  display:flex;flex-direction:column;gap:.4rem;
+  transition:background .15s;
+}
+.conn-item:hover{background:var(--ink2);}
+.conn-icon{font-size:1.4rem;}
+.conn-name{font-size:.85rem;font-weight:600;}
+.conn-sub{font-size:.72rem;color:rgba(245,242,237,.5);}
+.conn-status{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  margin-top:.25rem;
+}
+.conn-status .dot{width:6px;height:6px;border-radius:50%;}
+.conn-status.live .dot{background:#0f7c4a;}
+.conn-status.live{color:#4ade80;}
+.conn-status.soon .dot{background:#b07d2a;}
+.conn-status.soon{color:#fbbf24;}
+
+/* ── TESTIMONIAL / CASE ────────────────────────────────────────── */
+.case-section{
+  padding:6rem 2rem;max-width:900px;margin:0 auto;
+  display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;
+}
+.case-label{font-size:.7rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--mid);margin-bottom:.75rem;}
+.case-quote{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.65rem;font-weight:400;font-style:italic;
+  line-height:1.4;color:var(--ink);margin-bottom:1.25rem;
+}
+.case-attr{font-size:.8rem;color:var(--mid);}
+.case-numbers{display:flex;flex-direction:column;gap:1.25rem;}
+.case-num-item{
+  padding:1.25rem 1.5rem;
+  background:var(--cloud2);border:1px solid var(--line);border-radius:2px;
+  border-left:3px solid var(--accent);
+}
+.case-num-n{
+  font-family:'Cormorant Garamond',serif;
+  font-size:2rem;font-weight:600;letter-spacing:-.03em;
+}
+.case-num-n.red{color:var(--red);}
+.case-num-n.green{color:var(--green);}
+.case-num-l{font-size:.75rem;color:var(--mid);margin-top:2px;}
+
+/* ── PRICING ───────────────────────────────────────────────────── */
+.pricing-section{
+  padding:6rem 2rem;max-width:900px;margin:0 auto;text-align:center;
+}
+.pricing-grid{
+  display:grid;grid-template-columns:1fr 1fr 1fr;
+  gap:1.5rem;margin-top:3rem;text-align:left;
+}
+.price-card{
+  background:var(--cloud2);border:1px solid var(--line);
+  border-radius:2px;padding:2rem;
+}
+.price-card.featured{
+  background:var(--ink);color:var(--cloud);
+  border-color:var(--ink);
+}
+.price-name{
+  font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  margin-bottom:.75rem;
+}
+.price-name.featured{color:rgba(245,242,237,.6);}
+.price-n{
+  font-family:'Cormorant Garamond',serif;
+  font-size:2.5rem;font-weight:600;letter-spacing:-.03em;margin-bottom:.25rem;
+}
+.price-period{font-size:.75rem;color:var(--mid);margin-bottom:1.25rem;}
+.price-period.dark{color:rgba(245,242,237,.5);}
+.price-features{list-style:none;display:flex;flex-direction:column;gap:.6rem;}
+.price-features li{font-size:.82rem;display:flex;gap:.5rem;align-items:flex-start;}
+.price-features li::before{content:'✓';font-weight:700;flex-shrink:0;margin-top:1px;}
+.price-features.dark li{color:rgba(245,242,237,.8);}
+.price-features.dark li::before{color:var(--cloud);}
+.price-cta{
+  display:block;text-align:center;margin-top:1.5rem;
+  padding:11px 20px;border-radius:4px;font-size:.82rem;font-weight:600;
+  text-decoration:none;letter-spacing:.04em;transition:all .15s;
+}
+.price-cta.dark{background:var(--cloud);color:var(--ink);}
+.price-cta.dark:hover{background:var(--cloud2);}
+.price-cta.light{background:var(--ink);color:var(--cloud);}
+.price-cta.light:hover{background:var(--ink2);}
+
+/* ── CTA SECTION ───────────────────────────────────────────────── */
+.cta-section{
+  background:var(--ink);color:var(--cloud);
+  padding:6rem 2rem;text-align:center;
+}
+.cta-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(2.5rem,5vw,4.5rem);font-weight:300;
+  letter-spacing:-.03em;line-height:1;margin-bottom:1rem;
+}
+.cta-sub{font-size:.95rem;color:rgba(245,242,237,.6);margin-bottom:2.5rem;line-height:1.6;}
+.cta-form{
+  display:flex;gap:.75rem;justify-content:center;max-width:420px;margin:0 auto;
+  flex-wrap:wrap;
+}
+.cta-input{
+  flex:1;min-width:220px;padding:13px 18px;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
+  border-radius:4px;color:var(--cloud);font-size:.88rem;font-family:'DM Sans',sans-serif;
+  outline:none;transition:.15s;
+}
+.cta-input::placeholder{color:rgba(245,242,237,.35);}
+.cta-input:focus{border-color:rgba(255,255,255,.4);}
+.cta-btn{
+  padding:13px 28px;background:var(--cloud);color:var(--ink);
+  border:none;border-radius:4px;font-size:.88rem;font-weight:700;
+  cursor:pointer;letter-spacing:.04em;transition:all .15s;font-family:'DM Sans',sans-serif;
+}
+.cta-btn:hover{background:var(--cloud2);}
+
+/* ── FOOTER ────────────────────────────────────────────────────── */
+footer{
+  border-top:1px solid var(--line);padding:2rem 2.5rem;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:1rem;
+}
+.footer-logo{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.1rem;font-weight:600;color:var(--mid);
+}
+.footer-logo span{color:var(--accent);}
+.footer-copy{font-size:.75rem;color:var(--mid);}
+.footer-links{display:flex;gap:1.5rem;}
+.footer-links a{font-size:.75rem;color:var(--mid);text-decoration:none;}
+
+/* ── DIVIDER ───────────────────────────────────────────────────── */
+.divider{
+  height:1px;background:var(--line);
+  max-width:1100px;margin:0 auto;
+}
+
+/* ── ANIMATIONS ────────────────────────────────────────────────── */
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(24px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+/* ── RESPONSIVE ────────────────────────────────────────────────── */
+@media(max-width:768px){
+  nav{padding:1rem 1.25rem;}
+  .nav-links{display:none;}
+  .how-grid,.conn-grid,.pricing-grid{grid-template-columns:1fr;}
+  .case-section{grid-template-columns:1fr;}
+  .flow{grid-template-columns:1fr;gap:1rem;}
+  .flow::before{display:none;}
+  .stats-bar{gap:1.5rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">Bonos<span>track</span></a>
+  <div class="nav-links">
+    <a href="#problema">El problema</a>
+    <a href="#como">Cómo funciona</a>
+    <a href="#precios">Precios</a>
+    <a href="#demo">Demo</a>
+  </div>
+  <a href="#demo" class="nav-cta">Ver demo →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div style="position:relative;z-index:1;max-width:800px;">
+    <p class="hero-eyebrow">Compensación variable · Chile & LATAM</p>
+    <h1 class="hero-title">
+      El bono<br><em>correcto.</em><br>Por primera vez.
+    </h1>
+    <p class="hero-sub">
+      Bonostrack cruza la data real de ventas con tu esquema de compensación variable — automáticamente, sin Excel, sin política, con auditoría completa.
+    </p>
+    <div class="hero-actions">
+      <a href="#demo" class="btn-hero primary">Ver demo en vivo →</a>
+      <a href="#problema" class="btn-hero ghost">¿Por qué importa?</a>
+    </div>
+    <div class="stats-bar">
+      <div class="stat">
+        <div class="stat-n"><span class="stat-neg">3-5</span></div>
+        <div class="stat-l">Pasos manuales hoy</div>
+      </div>
+      <div class="stat">
+        <div class="stat-n"><span class="stat-neg">0</span></div>
+        <div class="stat-l">Auditorías retroactivas</div>
+      </div>
+      <div class="stat">
+        <div class="stat-n">$47M</div>
+        <div class="stat-l">CLP pagados de más / año</div>
+      </div>
+      <div class="stat">
+        <div class="stat-n"><span class="stat-neg">Excel</span></div>
+        <div class="stat-l">Herramienta actual de RRHH</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- PROBLEMA -->
+<section class="section" id="problema">
+  <p class="section-label">El problema</p>
+  <h2 class="section-title">El bono de tu KAM<br>se calcula sobre datos falsos.</h2>
+  <p class="section-sub">Hoy en Chile, el proceso de calcular un bono variable de un KAM funciona exactamente así — y cada paso es una oportunidad de error o manipulación.</p>
+
+  <div class="flow">
+    <div class="flow-step">
+      <div class="flow-num bad">1</div>
+      <div class="flow-label">SAP VF05</div>
+      <div class="flow-sub">Sell-in facturado al retailer</div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num bad">2</div>
+      <div class="flow-label">Email</div>
+      <div class="flow-sub danger">Finanzas envía el número a RRHH por correo</div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num bad">3</div>
+      <div class="flow-label">Excel manual</div>
+      <div class="flow-sub danger">RRHH lo ingresa a mano en su planilla</div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num bad">4</div>
+      <div class="flow-label">Buk / Talana</div>
+      <div class="flow-sub danger">Calcula el bono sobre ese número sin verificar</div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num bad">5</div>
+      <div class="flow-label">Pago erróneo</div>
+      <div class="flow-sub danger">Sin cruce con sell-out real. Sin auditoría.</div>
+    </div>
+  </div>
+
+  <div style="background:#fff8f8;border:1px solid rgba(200,32,42,.15);border-radius:2px;padding:1.5rem 2rem;max-width:680px;border-left:3px solid var(--red);">
+    <p style="font-size:.85rem;line-height:1.7;color:var(--ink2);">
+      <strong>El error más común:</strong> el bono se calcula sobre sell-in facturado — pero las notas de crédito (devoluciones, aportes de precio, fees de retailer) llegan 30-60 días después. El KAM ya cobró. Nadie recalcula.
+      <br><br>
+      <strong>Resultado:</strong> RRHH paga sobre un número que ya no existe en el P&L.
+    </p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CÓMO FUNCIONA -->
+<section class="section" id="como">
+  <p class="section-label">La solución</p>
+  <h2 class="section-title">Bonostrack conecta<br>los datos que ya tienes.</h2>
+  <p class="section-sub">Sin implementación compleja. Sin cambiar tu ERP. Sin consultoras de 6 meses. Bonostrack se conecta a tu stack actual y calcula el bono correcto automáticamente.</p>
+
+  <div class="how-grid">
+    <div class="how-card c1">
+      <div class="how-num">01</div>
+      <div class="how-title">Conecta tu data</div>
+      <div class="how-body">SAP VF05 (sell-in real post NC) + Portal B2B del retailer (sell-out confirmado) + tu estructura de compensación en Buk o Talana.</div>
+      <span class="how-tag">API · sin IT</span>
+    </div>
+    <div class="how-card c2">
+      <div class="how-num">02</div>
+      <div class="how-title">Bonostrack calcula</div>
+      <div class="how-body">El engine cruza sell-in vs sell-out, descuenta NCs correctamente, aplica el esquema KPI configurado y produce el bono auditable.</div>
+      <span class="how-tag">Automático · trazable</span>
+    </div>
+    <div class="how-card c3">
+      <div class="how-num">03</div>
+      <div class="how-title">RRHH aprueba</div>
+      <div class="how-body">RRHH recibe el número correcto y auditado. Lo aprueba con un clic. Buk paga. Sin Excel. Sin email. Sin discusión del lunes.</div>
+      <span class="how-tag">Un clic · sin política</span>
+    </div>
+  </div>
+</section>
+
+<!-- CONECTORES -->
+<div class="connectors" id="conectores">
+  <div class="connectors-inner">
+    <p style="font-size:.7rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(245,242,237,.4);margin-bottom:.75rem;">Integraciones</p>
+    <h2 style="font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:400;margin-bottom:.5rem;">Se conecta con tu stack actual.</h2>
+    <p style="font-size:.88rem;color:rgba(245,242,237,.5);margin-bottom:0;">Sin reemplazar nada. Sin nuevo ERP. Solo el dato correcto donde ya trabajas.</p>
+    <div class="conn-grid">
+      <div class="conn-item">
+        <div class="conn-icon">⚙️</div>
+        <div class="conn-name">SAP ECC / S4HANA</div>
+        <div class="conn-sub">VF05 sell-in · MB52 inventario · notas de crédito</div>
+        <div class="conn-status live"><div class="dot"></div>Disponible</div>
+      </div>
+      <div class="conn-item">
+        <div class="conn-icon">🛒</div>
+        <div class="conn-name">Portales B2B Chile</div>
+        <div class="conn-sub">Falabella · Ripley · Lider · Cencosud · Paris</div>
+        <div class="conn-status live"><div class="dot"></div>Disponible</div>
+      </div>
+      <div class="conn-item">
+        <div class="conn-icon">👥</div>
+        <div class="conn-name">Buk</div>
+        <div class="conn-sub">Nómina · estructura bono · liquidaciones</div>
+        <div class="conn-status live"><div class="dot"></div>Disponible</div>
+      </div>
+      <div class="conn-item">
+        <div class="conn-icon">📋</div>
+        <div class="conn-name">Talana</div>
+        <div class="conn-sub">Remuneraciones · asistencia · firma digital</div>
+        <div class="conn-status live"><div class="dot"></div>Disponible</div>
+      </div>
+      <div class="conn-item">
+        <div class="conn-icon">☁️</div>
+        <div class="conn-name">SAP SuccessFactors</div>
+        <div class="conn-sub">Esquema compensación corporativo · OData</div>
+        <div class="conn-status soon"><div class="dot"></div>Próximamente</div>
+      </div>
+      <div class="conn-item">
+        <div class="conn-icon">💊</div>
+        <div class="conn-name">IMS Health / IQVIA</div>
+        <div class="conn-sub">Prescripciones · market share farma</div>
+        <div class="conn-status soon"><div class="dot"></div>Próximamente</div>
+      </div>
+      <div class="conn-item">
+        <div class="conn-icon">📊</div>
+        <div class="conn-name">GFK Latindat</div>
+        <div class="conn-sub">Sell-out mercado · share de marca</div>
+        <div class="conn-status soon"><div class="dot"></div>Próximamente</div>
+      </div>
+      <div class="conn-item">
+        <div class="conn-icon">🔐</div>
+        <div class="conn-name">Previred</div>
+        <div class="conn-sub">Cotizaciones previsionales · compliance legal</div>
+        <div class="conn-status live"><div class="dot"></div>Disponible</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CASO -->
+<section class="case-section" id="caso">
+  <div>
+    <p class="case-label">Caso real</p>
+    <p class="case-quote">"Nuestros bonos están alineados al negocio."</p>
+    <p style="font-size:.9rem;color:var(--mid);line-height:1.7;margin-bottom:1rem;">
+      Esta es la frase que escucha Jonathan en cada onboarding. En la práctica, los esquemas se construyeron desde una lógica interna — sin entender cómo la compañía genera valor realmente.
+    </p>
+    <p style="font-size:.82rem;color:var(--mid);font-style:italic;">
+      — Empresa consumo masivo Chile, 150 colaboradores, 5 KAMs comerciales
+    </p>
+  </div>
+  <div class="case-numbers">
+    <div class="case-num-item">
+      <div class="case-num-n red">$47.3M</div>
+      <div class="case-num-l">CLP pagados de más en bonos variables — 2025</div>
+    </div>
+    <div class="case-num-item" style="border-left-color:var(--red)">
+      <div class="case-num-n red">3 / 5</div>
+      <div class="case-num-l">KAMs con bono incorrecto — calculado sobre sell-in, no sell-out</div>
+    </div>
+    <div class="case-num-item" style="border-left-color:var(--green)">
+      <div class="case-num-n green">$8.2M</div>
+      <div class="case-num-l">CLP que le debían a 1 KAM — subpago detectado por Bonostrack</div>
+    </div>
+    <div class="case-num-item" style="border-left-color:var(--ink)">
+      <div class="case-num-n">0</div>
+      <div class="case-num-l">Pasos manuales después de implementar Bonostrack</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- PRECIOS -->
+<section class="pricing-section" id="precios">
+  <p class="section-label" style="text-align:center">Precios</p>
+  <h2 class="section-title" style="text-align:center">Transparente.<br>Como tus bonos.</h2>
+  <div class="pricing-grid">
+
+    <div class="price-card">
+      <div class="price-name">Básico</div>
+      <div class="price-n">$800K</div>
+      <div class="price-period">CLP / mes · hasta 5 KAMs</div>
+      <ul class="price-features">
+        <li>Cálculo bono sobre SAP sell-in real</li>
+        <li>Dashboard RRHH + GM</li>
+        <li>Integración Buk o Talana</li>
+        <li>Auditoría 12 meses retroactivos</li>
+        <li>Export Excel certificado</li>
+      </ul>
+      <a href="#demo" class="price-cta light">Empezar →</a>
+    </div>
+
+    <div class="price-card featured">
+      <div class="price-name featured">Completo ★</div>
+      <div class="price-n">$1.5M</div>
+      <div class="price-period dark">CLP / mes · hasta 15 KAMs</div>
+      <ul class="price-features dark">
+        <li>Todo lo del plan Básico</li>
+        <li>Sell-out real portal B2B retailer</li>
+        <li>Cruce SI vs SO automático</li>
+        <li>KPIs configurables por rol</li>
+        <li>Alerta automática RRHH</li>
+        <li>PDF auditable firmado digitalmente</li>
+      </ul>
+      <a href="#demo" class="price-cta dark">Solicitar demo →</a>
+    </div>
+
+    <div class="price-card">
+      <div class="price-name">Enterprise</div>
+      <div class="price-n">$3M</div>
+      <div class="price-period">CLP / mes · KAMs ilimitados</div>
+      <ul class="price-features">
+        <li>Todo lo del plan Completo</li>
+        <li>Retroactivo 24 meses</li>
+        <li>Recomendación rediseño esquema</li>
+        <li>Integración SAP SuccessFactors</li>
+        <li>IMS Health / IQVIA (farma)</li>
+        <li>SLA garantizado · Onboarding incluido</li>
+      </ul>
+      <a href="#demo" class="price-cta light">Hablar con ventas →</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="demo">
+  <div style="max-width:600px;margin:0 auto;">
+    <p style="font-size:.7rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(245,242,237,.4);margin-bottom:1rem;">Empezar</p>
+    <h2 class="cta-title">¿Cuánto estás<br>pagando de más?</h2>
+    <p class="cta-sub">
+      Demo gratuita · 30 minutos · sin compromiso<br>
+      Te mostramos el gap en tus propios datos.
+    </p>
+    <div class="cta-form">
+      <input class="cta-input" type="email" placeholder="tu@empresa.cl">
+      <button class="cta-btn" onclick="alert('¡Gracias! Nos contactamos en 24 horas.')">Ver mi demo →</button>
+    </div>
+    <p style="font-size:.72rem;color:rgba(245,242,237,.3);margin-top:1rem;">
+      Sin tarjeta de crédito · Sin implementación · Sin IT
+    </p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Bonos<span>track</span></div>
+  <div class="footer-links">
+    <a href="#">Privacidad</a>
+    <a href="#">Términos</a>
+    <a href="#">Contacto</a>
+  </div>
+  <p class="footer-copy">© 2026 Bonostrack · Conatus Analysis AB · Suecia</p>
+</footer>
+
+</body>
+</html>

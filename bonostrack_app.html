@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bonostrack — App</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --cloud:#F5F2ED;--cloud2:#EDE8E0;--cloud3:#E0D9CE;
+  --ink:#1C1917;--ink2:#2C2825;--mid:#7A7268;
+  --accent:#8B2FC9;--red:#C8202A;--green:#0F7C4A;
+  --amber:#B07D2A;--line:rgba(28,25,23,.1);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--cloud);color:var(--ink);font-size:14px;min-height:100vh;}
+
+/* NAV */
+nav{background:var(--ink);height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;position:sticky;top:0;z-index:100;}
+.nav-logo{font-family:'Cormorant Garamond',serif;color:white;font-size:1.1rem;font-weight:600;}
+.nav-logo span{color:#c084fc;}
+.nav-tabs{display:flex;gap:2px;}
+.nav-tab{padding:6px 14px;border-radius:4px;font-size:.78rem;font-weight:500;cursor:pointer;color:rgba(255,255,255,.5);border:none;background:transparent;font-family:'DM Sans',sans-serif;transition:.15s;}
+.nav-tab.on{background:rgba(255,255,255,.12);color:white;}
+.nav-right{display:flex;align-items:center;gap:.75rem;}
+.toggle-wrap{display:flex;align-items:center;gap:.5rem;font-size:.72rem;color:rgba(255,255,255,.5);}
+.toggle-track{position:relative;width:32px;height:18px;background:rgba(255,255,255,.2);border-radius:9px;cursor:pointer;transition:.2s;}
+.toggle-track.on{background:#8B2FC9;}
+.toggle-knob{position:absolute;top:2px;left:2px;width:14px;height:14px;background:white;border-radius:50%;transition:transform .2s;}
+.toggle-track.on .toggle-knob{transform:translateX(14px);}
+.user-badge{background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);font-size:.7rem;padding:4px 10px;border-radius:20px;}
+
+/* LAYOUT */
+.container{max-width:1080px;margin:0 auto;padding:1.5rem;}
+.view{display:none;}
+.view.on{display:block;}
+
+/* CARDS */
+.card{background:white;border-radius:4px;border:1px solid var(--line);padding:1rem;margin-bottom:.9rem;}
+.card-title{font-family:'Cormorant Garamond',serif;font-size:.95rem;font-weight:600;margin-bottom:.2rem;}
+.card-sub{font-size:.72rem;color:var(--mid);margin-bottom:.85rem;}
+
+/* KPIS */
+.krow{display:grid;gap:9px;margin-bottom:1rem;}
+.k4{grid-template-columns:repeat(4,1fr);}
+.k5{grid-template-columns:repeat(5,1fr);}
+.kpi{background:white;border-radius:4px;border:1px solid var(--line);padding:.85rem .9rem;}
+.kpi.red{border-color:var(--red);background:#fff8f8;}
+.kpi.green{border-color:var(--green);background:#f0faf4;}
+.kpi.amber{border-color:var(--amber);background:#fdf8ee;}
+.kl{font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--mid);font-weight:600;margin-bottom:3px;}
+.kv{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600;line-height:1;}
+.kd{font-size:.7rem;font-weight:500;margin-top:3px;}
+.up{color:var(--green);}.dn{color:var(--red);}.nu{color:var(--mid);}.wa{color:var(--amber);}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse;font-size:.78rem;}
+thead th{padding:8px 10px;text-align:right;font-size:.61rem;text-transform:uppercase;letter-spacing:.07em;color:var(--mid);font-weight:600;border-bottom:2px solid var(--line);background:var(--cloud);white-space:nowrap;}
+thead th:first-child,thead th:nth-child(2){text-align:left;}
+tbody td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:right;}
+tbody td:first-child,tbody td:nth-child(2){text-align:left;font-weight:500;}
+tbody tr.over td{background:#fff8f8;}
+tbody tr.under td{background:#f0faf4;}
+.pill{display:inline-flex;font-size:.66rem;font-weight:600;padding:2px 7px;border-radius:20px;}
+.pg{background:#e6f5ee;color:var(--green);}
+.pr{background:#fde8e8;color:var(--red);}
+.pa{background:#fef3e8;color:var(--amber);}
+.pp{background:#f3e8ff;color:var(--accent);}
+
+/* CHART */
+.cw{position:relative;height:220px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:.9rem;}
+
+/* ══ KAM VIEW ══ */
+.kam-hero{
+  background:var(--ink);color:white;
+  border-radius:4px;padding:2rem 1.5rem;
+  margin-bottom:1rem;
+  display:grid;grid-template-columns:1fr auto;gap:1rem;align-items:center;
+}
+.kam-greeting{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;opacity:.5;margin-bottom:.35rem;}
+.kam-name{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:400;margin-bottom:.1rem;}
+.kam-period{font-size:.78rem;opacity:.5;}
+.bono-box{text-align:right;}
+.bono-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;opacity:.5;margin-bottom:.25rem;}
+.bono-amount{font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:600;line-height:1;}
+.bono-sub{font-size:.72rem;opacity:.6;margin-top:.2rem;}
+
+/* PROGRESS RING */
+.progress-section{background:white;border-radius:4px;border:1px solid var(--line);padding:1.5rem;margin-bottom:1rem;}
+.progress-grid{display:grid;grid-template-columns:auto 1fr;gap:1.5rem;align-items:center;}
+.ring-wrap{position:relative;width:120px;height:120px;flex-shrink:0;}
+.ring-wrap canvas{position:absolute;top:0;left:0;}
+.ring-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;}
+.ring-pct{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:600;line-height:1;}
+.ring-lbl{font-size:.62rem;color:var(--mid);text-transform:uppercase;letter-spacing:.06em;}
+.kpi-breakdown{display:flex;flex-direction:column;gap:.6rem;}
+.kpi-row{display:flex;align-items:center;gap:.75rem;}
+.kpi-name{font-size:.8rem;font-weight:500;width:130px;flex-shrink:0;}
+.kpi-bar-wrap{flex:1;height:8px;background:var(--cloud2);border-radius:4px;overflow:hidden;}
+.kpi-bar{height:100%;border-radius:4px;transition:width .6s ease;}
+.kpi-val{font-size:.78rem;font-weight:600;width:50px;text-align:right;flex-shrink:0;}
+.kpi-peso{font-size:.65rem;color:var(--mid);width:28px;text-align:right;flex-shrink:0;}
+
+/* SEALED PDF BUTTON */
+.seal-btn{
+  display:flex;align-items:center;gap:.75rem;
+  padding:1rem 1.25rem;border-radius:4px;
+  background:var(--ink);color:white;
+  cursor:pointer;border:none;font-family:'DM Sans',sans-serif;
+  width:100%;font-size:.88rem;font-weight:600;
+  transition:all .15s;margin-top:.75rem;
+}
+.seal-btn:hover{background:var(--ink2);}
+.seal-icon{font-size:1.4rem;}
+.seal-text{text-align:left;}
+.seal-title{font-weight:700;}
+.seal-sub{font-size:.72rem;opacity:.6;margin-top:2px;}
+.seal-badge{margin-left:auto;background:#8B2FC9;font-size:.65rem;font-weight:700;padding:3px 8px;border-radius:20px;letter-spacing:.04em;}
+
+/* ALERTA VISOR */
+.visor-alert{
+  background:#f3e8ff;border:1.5px solid #c084fc;
+  border-radius:4px;padding:.85rem 1rem;
+  font-size:.8rem;color:#4c1d95;
+  display:flex;align-items:center;gap:.5rem;
+  margin-bottom:1rem;
+}
+.visor-off{
+  background:#fff8f8;border:1.5px solid var(--red);
+  border-radius:4px;padding:1.5rem;text-align:center;
+  font-size:.85rem;color:var(--red);margin:1rem 0;
+}
+
+/* RRHH BANDEJA */
+.aprobacion-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.85rem 1rem;border-bottom:1px solid var(--line);
+  gap:.5rem;flex-wrap:wrap;
+}
+.aprobacion-row:last-child{border-bottom:none;}
+.apr-name{font-weight:600;font-size:.85rem;min-width:160px;}
+.apr-details{display:flex;gap:1rem;flex:1;font-size:.78rem;color:var(--mid);}
+.apr-detail{display:flex;flex-direction:column;}
+.apr-detail strong{color:var(--ink);font-size:.82rem;}
+.apr-actions{display:flex;gap:.5rem;}
+.btn-approve{padding:6px 14px;background:var(--green);color:white;border:none;border-radius:3px;font-size:.75rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.btn-reject{padding:6px 14px;background:white;color:var(--red);border:1.5px solid var(--red);border-radius:3px;font-size:.75rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
+
+@media(max-width:640px){
+  .k4,.k5{grid-template-columns:repeat(2,1fr);}
+  .g2{grid-template-columns:1fr;}
+  .kam-hero{grid-template-columns:1fr;}
+  .bono-box{text-align:left;}
+  .progress-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">Bonos<span>track</span></div>
+  <div class="nav-tabs">
+    <button class="nav-tab on" onclick="setView('gm',this)">👔 GM</button>
+    <button class="nav-tab" onclick="setView('kam',this)">📊 KAM</button>
+    <button class="nav-tab" onclick="setView('rrhh',this)">👥 RRHH</button>
+  </div>
+  <div class="nav-right">
+    <div class="toggle-wrap">
+      Visor KAM
+      <div class="toggle-track on" id="visorToggle" onclick="toggleVisor()">
+        <div class="toggle-knob"></div>
+      </div>
+    </div>
+    <span class="user-badge">Midea Carrier Chile</span>
+  </div>
+</nav>
+
+<!-- ══ VISTA GM ═══════════════════════════════════════════════════ -->
+<div id="view-gm" class="view on">
+<div class="container">
+
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem;">
+    <div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600;">Dashboard Compensación Variable</div>
+      <div style="font-size:.75rem;color:var(--mid);">Cierre Marzo 2026 · Fuerza Comercial HA · Midea Carrier Chile</div>
+    </div>
+    <div style="background:#fff8f8;border:1.5px solid var(--red);border-radius:4px;padding:.6rem 1rem;font-size:.8rem;color:var(--red);font-weight:600;">
+      ⚠ $38.4M CLP en sobrepagos detectados este trimestre
+    </div>
+  </div>
+
+  <div class="krow k4">
+    <div class="kpi red"><div class="kl">Sobrepago total Q1</div><div class="kv">$38.4M</div><div class="kd dn">CLP · vs bono correcto</div></div>
+    <div class="kpi"><div class="kl">KAMs sobrepagados</div><div class="kv">3 / 5</div><div class="kd wa">Requieren ajuste</div></div>
+    <div class="kpi green"><div class="kl">KAMs subpagados</div><div class="kv">1 / 5</div><div class="kd up">Le deben $6.2M</div></div>
+    <div class="kpi"><div class="kl">Ahorro proyectado anual</div><div class="kv">$154M</div><div class="kd nu">Con Bonostrack activo</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Todos los KAMs — Bono pagado vs Bono correcto · Marzo 2026</div>
+    <div class="card-sub">Rojo = sobrepago · Verde = subpago · Fuente: SAP VF05 + Portal B2B Falabella/Ripley/Lider</div>
+    <div style="overflow-x:auto">
+    <table>
+      <thead><tr>
+        <th>KAM</th><th>Canal</th>
+        <th>Sell-IN SAP</th><th>Sell-OUT real</th>
+        <th>Bono pagado</th><th>Bono correcto</th>
+        <th>Diferencia</th><th>Estado</th>
+      </tr></thead>
+      <tbody id="gmTableBody"></tbody>
+    </table>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="card-title">Gap por KAM</div>
+      <div class="card-sub">Bono pagado vs correcto en CLP</div>
+      <div class="cw"><canvas id="gapChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Sell-IN vs Sell-OUT</div>
+      <div class="card-sub">El origen del error en el bono</div>
+      <div class="cw"><canvas id="sisoChart"></canvas></div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:.75rem;flex-wrap:wrap;">
+    <button style="padding:11px 24px;background:var(--ink);color:white;border:none;border-radius:4px;font-size:.85rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="alert('Exportando reporte ejecutivo PDF...')">↓ Descargar Reporte GM</button>
+    <button style="padding:11px 24px;background:var(--red);color:white;border:none;border-radius:4px;font-size:.85rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="alert('Notificación enviada a RRHH con detalle de ajustes requeridos.')">⚠ Notificar a RRHH</button>
+  </div>
+
+</div>
+</div>
+
+<!-- ══ VISTA KAM ═══════════════════════════════════════════════════ -->
+<div id="view-kam" class="view">
+<div class="container">
+
+  <div id="visorOnContent">
+
+    <div class="visor-alert">
+      🔓 <span>El Visor KAM está <strong>activo</strong> — estás viendo tu bono proyectado en tiempo real. RRHH puede desactivar este acceso en cualquier momento.</span>
+    </div>
+
+    <!-- SELECTOR KAM -->
+    <div style="display:flex;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap;" id="kamChips"></div>
+
+    <div class="kam-hero" id="kamHero"></div>
+
+    <!-- PROGRESS -->
+    <div class="progress-section">
+      <div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--mid);font-weight:600;margin-bottom:1rem;">Avance por KPI — Marzo 2026 (al día 17)</div>
+      <div class="progress-grid">
+        <div class="ring-wrap">
+          <canvas id="ringChart" width="120" height="120"></canvas>
+          <div class="ring-center">
+            <div class="ring-pct" id="ringPct">–</div>
+            <div class="ring-lbl">Avance</div>
+          </div>
+        </div>
+        <div class="kpi-breakdown" id="kpiBreakdown"></div>
+      </div>
+    </div>
+
+    <!-- BONO BREAKDOWN -->
+    <div class="g2">
+      <div class="card">
+        <div class="card-title">Cálculo bono — método anterior (incorrecto)</div>
+        <div class="card-sub">Basado en Sell-IN SAP · sin cruce sell-out</div>
+        <div id="calcViejo"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Cálculo bono — Bonostrack (correcto)</div>
+        <div class="card-sub">Basado en Sell-OUT real · portal B2B auditado</div>
+        <div id="calcNuevo"></div>
+      </div>
+    </div>
+
+    <!-- HISTORIAL -->
+    <div class="card">
+      <div class="card-title">Historial mensual — últimos 6 meses</div>
+      <div class="card-sub">Bono pagado vs correcto · diferencia acumulada</div>
+      <div style="overflow-x:auto"><table id="histTable"></table></div>
+    </div>
+
+    <!-- INFORME SELLADO -->
+    <div class="card">
+      <div class="card-title">Informe Sellado — Febrero 2026</div>
+      <div class="card-sub">Generado el 28 Feb 2026 23:59:47 · datos congelados · no modificable</div>
+      <div style="background:var(--cloud);border:1px solid var(--line);border-radius:4px;padding:.85rem 1rem;font-size:.78rem;line-height:1.8;font-family:monospace;">
+        <div><span style="color:var(--mid)">KAM:</span> <span id="sealKAM">–</span></div>
+        <div><span style="color:var(--mid)">Período:</span> Febrero 2026</div>
+        <div><span style="color:var(--mid)">Sell-OUT confirmado:</span> <span id="sealSO">–</span> unidades</div>
+        <div><span style="color:var(--mid)">Base de cálculo:</span> SAP VF05 + Portal B2B Falabella/Ripley/Lider</div>
+        <div><span style="color:var(--mid)">Bono correcto:</span> <span id="sealBono">–</span></div>
+        <div><span style="color:var(--mid)">Timestamp:</span> 2026-02-28T23:59:47.000Z</div>
+        <div><span style="color:var(--mid)">Hash:</span> <span style="color:var(--accent)">bt_8f3a9c2d4e1b7f6a</span></div>
+        <div><span style="color:var(--mid)">Firmado por:</span> Bonostrack · Conatus Analysis AB</div>
+      </div>
+      <button class="seal-btn" onclick="alert('Descargando informe sellado PDF...\n\nEste documento tiene validez como respaldo frente a cualquier ajuste posterior.')">
+        <div class="seal-icon">📄</div>
+        <div class="seal-text">
+          <div class="seal-title">Descargar Informe Sellado — Febrero 2026</div>
+          <div class="seal-sub">PDF · fecha y datos congelados · no modificable</div>
+        </div>
+        <div class="seal-badge">🔒 SELLADO</div>
+      </button>
+    </div>
+
+  </div>
+
+  <div id="visorOffContent" style="display:none;">
+    <div class="visor-off">
+      🔒 El Visor KAM está desactivado.<br>
+      <span style="font-size:.75rem;opacity:.7;display:block;margin-top:.35rem;">RRHH ha desactivado el acceso al bono proyectado. Contacta a RRHH para más información.</span>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ══ VISTA RRHH ══════════════════════════════════════════════════ -->
+<div id="view-rrhh" class="view">
+<div class="container">
+
+  <div class="krow k4" style="grid-template-columns:repeat(4,1fr)">
+    <div class="kpi red"><div class="kl">Sobrepago detectado Q1</div><div class="kv">$38.4M</div><div class="kd dn">CLP · debe ajustarse</div></div>
+    <div class="kpi"><div class="kl">Bonos pendientes aprobación</div><div class="kv">5</div><div class="kd wa">Marzo 2026</div></div>
+    <div class="kpi green"><div class="kl">Subpago a recuperar</div><div class="kv">$6.2M</div><div class="kd up">1 KAM afectado</div></div>
+    <div class="kpi"><div class="kl">Horas ahorradas este mes</div><div class="kv">~8h</div><div class="kd nu">vs proceso Excel manual</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Bandeja de Aprobación — Marzo 2026</div>
+    <div class="card-sub">RRHH aprueba con un clic · dato calculado por Bonostrack · trazable · auditable · sin Excel</div>
+    <div id="bandejaList"></div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="card-title">Evolución bonos pagados vs correctos</div>
+      <div class="card-sub">Últimos 6 meses · brecha total identificada</div>
+      <div class="cw"><canvas id="rrhhChart"></canvas></div>
+    </div>
+    <div class="card" style="background:#fff8f8;border-color:var(--red);">
+      <div class="card-title" style="color:var(--red);">⚠ Alertas de Auditoría</div>
+      <div class="card-sub">Inconsistencias detectadas automáticamente</div>
+      <div id="alertList" style="display:flex;flex-direction:column;gap:.5rem;margin-top:.25rem;"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;flex-wrap:wrap;gap:.5rem;">
+      <div>
+        <div class="card-title" style="margin-bottom:0">Control de Transparencia</div>
+        <div style="font-size:.72rem;color:var(--mid);">RRHH controla qué ve cada KAM</div>
+      </div>
+    </div>
+    <div id="transparencyList" style="display:flex;flex-direction:column;gap:4px;"></div>
+  </div>
+
+  <button style="padding:11px 24px;background:var(--accent);color:white;border:none;border-radius:4px;font-size:.85rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="alert('Exportando reporte de auditoría RRHH...')">↓ Exportar Reporte Auditoría</button>
+
+</div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────
+const KAMS=[
+  {id:'rodrigo',nombre:'Rodrigo Morales',canal:'Falabella · Ripley',
+   target_si:4800,real_si:5200,real_so:3800,
+   bono_pagado:17800000,bono_correcto:10900000,gap:-6900000,
+   kpis:[
+     {n:'Sales Revenue',peso:.3,avance:.92,bar:'#1a1a47'},
+     {n:'Gross Margin%',peso:.4,avance:.71,bar:'#c8202a'},
+     {n:'Sell-OUT Amount',peso:.3,avance:.79,bar:'#b07d2a'},
+   ],
+   hist:[
+     {mes:'Oct 25',so:3620,pagado:16200000,correcto:10400000},
+     {mes:'Nov 25',so:6890,pagado:28400000,correcto:19800000},
+     {mes:'Dic 25',so:4210,pagado:19100000,correcto:12100000},
+     {mes:'Ene 26',so:3540,pagado:15800000,correcto:10200000},
+     {mes:'Feb 26',so:3720,pagado:16500000,correcto:10700000},
+     {mes:'Mar 26',so:null,pagado:null,correcto:null,proyectado:10900000},
+   ]
+  },
+  {id:'carolina',nombre:'Carolina Vega',canal:'Lider · Sodimac',
+   target_si:3600,real_si:3400,real_so:3200,
+   bono_pagado:11800000,bono_correcto:14200000,gap:2400000,
+   kpis:[
+     {n:'Sales Revenue',peso:.3,avance:.96,bar:'#0f7c4a'},
+     {n:'Gross Margin%',peso:.4,avance:.98,bar:'#0f7c4a'},
+     {n:'Sell-OUT Amount',peso:.3,avance:.99,bar:'#0f7c4a'},
+   ],
+   hist:[
+     {mes:'Oct 25',so:3050,pagado:11200000,correcto:13400000},
+     {mes:'Nov 25',so:6120,pagado:22800000,correcto:26200000},
+     {mes:'Dic 25',so:3890,pagado:14600000,correcto:17100000},
+     {mes:'Ene 26',so:3010,pagado:11000000,correcto:13200000},
+     {mes:'Feb 26',so:3180,pagado:11600000,correcto:13900000},
+     {mes:'Mar 26',so:null,pagado:null,correcto:null,proyectado:14200000},
+   ]
+  },
+  {id:'pablo',nombre:'Pablo Jiménez',canal:'Paris · Hites',
+   target_si:2800,real_si:3100,real_so:2100,
+   bono_pagado:14100000,bono_correcto:8600000,gap:-5500000,
+   kpis:[
+     {n:'Sales Revenue',peso:.3,avance:.88,bar:'#1a1a47'},
+     {n:'Gross Margin%',peso:.4,avance:.62,bar:'#c8202a'},
+     {n:'Sell-OUT Amount',peso:.3,avance:.75,bar:'#b07d2a'},
+   ],
+   hist:[
+     {mes:'Oct 25',so:2010,pagado:13200000,correcto:8200000},
+     {mes:'Nov 25',so:4020,pagado:26800000,correcto:16200000},
+     {mes:'Dic 25',so:2480,pagado:16100000,correcto:9900000},
+     {mes:'Ene 26',so:1980,pagado:13000000,correcto:8100000},
+     {mes:'Feb 26',so:2080,pagado:13600000,correcto:8400000},
+     {mes:'Mar 26',so:null,pagado:null,correcto:null,proyectado:8600000},
+   ]
+  },
+  {id:'monica',nombre:'Mónica Reyes',canal:'Falabella · Jumbo',
+   target_si:4200,real_si:4100,real_so:3900,
+   bono_pagado:15400000,bono_correcto:16100000,gap:700000,
+   kpis:[
+     {n:'Sales Revenue',peso:.3,avance:.98,bar:'#0f7c4a'},
+     {n:'Gross Margin%',peso:.4,avance:.96,bar:'#0f7c4a'},
+     {n:'Sell-OUT Amount',peso:.3,avance:.97,bar:'#0f7c4a'},
+   ],
+   hist:[
+     {mes:'Oct 25',so:3710,pagado:14600000,correcto:15300000},
+     {mes:'Nov 25',so:7450,pagado:29200000,correcto:30400000},
+     {mes:'Dic 25',so:4610,pagado:18100000,correcto:18800000},
+     {mes:'Ene 26',so:3680,pagado:14400000,correcto:15200000},
+     {mes:'Feb 26',so:3840,pagado:15100000,correcto:15800000},
+     {mes:'Mar 26',so:null,pagado:null,correcto:null,proyectado:16100000},
+   ]
+  },
+  {id:'andres',nombre:'Andrés Castro',canal:'Ripley · Cencosud',
+   target_si:3200,real_si:3800,real_so:2400,
+   bono_pagado:17100000,bono_correcto:8700000,gap:-8400000,
+   kpis:[
+     {n:'Sales Revenue',peso:.3,avance:.84,bar:'#1a1a47'},
+     {n:'Gross Margin%',peso:.4,avance:.58,bar:'#c8202a'},
+     {n:'Sell-OUT Amount',peso:.3,avance:.72,bar:'#c8202a'},
+   ],
+   hist:[
+     {mes:'Oct 25',so:2290,pagado:16000000,correcto:8200000},
+     {mes:'Nov 25',so:4580,pagado:32100000,correcto:16400000},
+     {mes:'Dic 25',so:2840,pagado:19800000,correcto:10200000},
+     {mes:'Ene 26',so:2260,pagado:15800000,correcto:8100000},
+     {mes:'Feb 26',so:2380,pagado:16600000,correcto:8500000},
+     {mes:'Mar 26',so:null,pagado:null,correcto:null,proyectado:8700000},
+   ]
+  },
+];
+
+const ML=['Oct 25','Nov 25','Dic 25','Ene 26','Feb 26','Mar 26'];
+let aktKAM=KAMS[0];
+let visorOn=true;
+let charts={};
+
+// ── UTILS ─────────────────────────────────────────────────────────
+function fm(n){
+  if(n===null||n===undefined)return '—';
+  const a=Math.abs(n);
+  const s=n<0?'-':'+';
+  if(a>=1000000)return `${n<0?'-':''}$${(a/1000000).toFixed(1)}M`;
+  return `${n<0?'-':''}$${Math.round(a).toLocaleString('es-CL')}`;
+}
+function fmp(n){return `$${Math.round(Math.abs(n)).toLocaleString('es-CL')}`;}
+
+// ── VIEW SWITCH ───────────────────────────────────────────────────
+function setView(id,btn){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+  document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('on'));
+  document.getElementById('view-'+id).classList.add('on');
+  btn.classList.add('on');
+  if(id==='gm')renderGM();
+  if(id==='rrhh')renderRRHH();
+}
+
+// ── VISOR TOGGLE ──────────────────────────────────────────────────
+function toggleVisor(){
+  visorOn=!visorOn;
+  const t=document.getElementById('visorToggle');
+  t.classList.toggle('on',visorOn);
+  document.getElementById('visorOnContent').style.display=visorOn?'block':'none';
+  document.getElementById('visorOffContent').style.display=visorOn?'none':'block';
+  renderTransparency();
+}
+
+// ── GM ────────────────────────────────────────────────────────────
+function renderGM(){
+  let html='';
+  KAMS.forEach(k=>{
+    const g=k.gap;
+    const css=g<-1000000?'over':g>1000000?'under':'';
+    const pill=g<-1000000?`<span class="pill pr">Sobrepago ${fm(Math.abs(g))}</span>`:
+               g>1000000?`<span class="pill pg">Subpago ${fm(g)}</span>`:
+               `<span class="pill pa">~OK</span>`;
+    html+=`<tr class="${css}">
+      <td><strong>${k.nombre}</strong></td>
+      <td style="font-size:.72rem;color:var(--mid)">${k.canal}</td>
+      <td>${fmp(k.real_si*9800)}</td>
+      <td>${fmp(k.real_so*9800)}</td>
+      <td class="${g<0?'dn':''}">${fmp(k.bono_pagado)}</td>
+      <td>${fmp(k.bono_correcto)}</td>
+      <td class="${g<0?'dn':'up'}" style="font-weight:700">${fm(g)}</td>
+      <td>${pill}</td>
+    </tr>`;
+  });
+  const tp=KAMS.reduce((s,k)=>s+k.bono_pagado,0);
+  const tc=KAMS.reduce((s,k)=>s+k.bono_correcto,0);
+  const tg=KAMS.reduce((s,k)=>s+k.gap,0);
+  html+=`<tr style="background:var(--cloud);font-weight:700;">
+    <td colspan="4">TOTAL</td>
+    <td>${fmp(tp)}</td><td>${fmp(tc)}</td>
+    <td class="dn">${fm(tg)}</td>
+    <td><span class="pill pr">$${Math.round(Math.abs(tg)/1000000)}M ajuste</span></td>
+  </tr>`;
+  document.getElementById('gmTableBody').innerHTML=html;
+
+  if(charts.gap)charts.gap.destroy();
+  charts.gap=new Chart(document.getElementById('gapChart'),{type:'bar',
+    data:{labels:KAMS.map(k=>k.nombre.split(' ')[0]),
+      datasets:[{label:'Gap CLP',data:KAMS.map(k=>k.gap),
+        backgroundColor:KAMS.map(k=>k.gap<0?'rgba(200,32,42,.7)':'rgba(15,124,74,.7)'),borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{grid:{display:false},ticks:{font:{size:10}}},
+              y:{grid:{color:'#f0f0f0'},ticks:{font:{size:9},callback:v=>(v>=0?'+':'')+Math.round(v/1000000)+'M'}}}}});
+
+  if(charts.siso)charts.siso.destroy();
+  charts.siso=new Chart(document.getElementById('sisoChart'),{type:'bar',
+    data:{labels:KAMS.map(k=>k.nombre.split(' ')[0]),
+      datasets:[
+        {label:'Sell-IN',data:KAMS.map(k=>k.real_si),backgroundColor:'rgba(26,26,71,.6)',borderRadius:3},
+        {label:'Sell-OUT',data:KAMS.map(k=>k.real_so),backgroundColor:'rgba(176,125,42,.6)',borderRadius:3},
+      ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{boxWidth:11,font:{size:10},padding:10}}},
+      scales:{x:{grid:{display:false},ticks:{font:{size:10}}},
+              y:{grid:{color:'#f0f0f0'},ticks:{font:{size:9}}}}}});
+}
+
+// ── KAM ──────────────────────────────────────────────────────────
+function buildKamChips(){
+  document.getElementById('kamChips').innerHTML=KAMS.map(k=>`
+    <button onclick="selKAM('${k.id}')" style="padding:6px 14px;border-radius:20px;font-size:.78rem;font-weight:500;cursor:pointer;border:1.5px solid ${k.id===aktKAM.id?'var(--ink)':'var(--line)'};background:${k.id===aktKAM.id?'var(--ink)':'white'};color:${k.id===aktKAM.id?'white':'var(--ink)'};font-family:'DM Sans',sans-serif;transition:.15s;">
+      ${k.nombre.split(' ')[0]} ${k.gap<-1000000?'⚠':k.gap>1000000?'✓':''}
+    </button>`).join('');
+}
+function selKAM(id){aktKAM=KAMS.find(k=>k.id===id);buildKamChips();renderKAM();}
+
+function renderKAM(){
+  const k=aktKAM;
+  const pct=Math.round(k.kpis.reduce((s,kp)=>s+kp.avance*kp.peso,0)*100);
+  const bonoBase=2800000;
+  const bonoVar=840000;
+  const soAvance=k.real_so/k.target_si;
+  const siAvance=k.real_si/k.target_si;
+
+  // Hero
+  document.getElementById('kamHero').innerHTML=`
+    <div>
+      <div class="kam-greeting">Bonostrack · Vista Personal</div>
+      <div class="kam-name">${k.nombre}</div>
+      <div class="kam-period">Marzo 2026 · ${k.canal}</div>
+    </div>
+    <div class="bono-box">
+      <div class="bono-label">Bono proyectado este mes</div>
+      <div class="bono-amount">${fmp(k.bono_correcto)}</div>
+      <div class="bono-sub">${pct}% de avance · día 17 de 31</div>
+    </div>`;
+
+  // Ring
+  document.getElementById('ringPct').textContent=pct+'%';
+  if(charts.ring)charts.ring.destroy();
+  const color=pct>=90?'#0f7c4a':pct>=70?'#b07d2a':'#c8202a';
+  charts.ring=new Chart(document.getElementById('ringChart'),{type:'doughnut',
+    data:{datasets:[{data:[pct,100-pct],backgroundColor:[color,'#ede8e0'],borderWidth:0,cutout:'78%'}]},
+    options:{responsive:false,plugins:{legend:{display:false},tooltip:{enabled:false}}}});
+
+  // KPI breakdown
+  document.getElementById('kpiBreakdown').innerHTML=k.kpis.map(kp=>`
+    <div class="kpi-row">
+      <div class="kpi-name">${kp.n}</div>
+      <div class="kpi-bar-wrap"><div class="kpi-bar" style="width:${kp.avance*100}%;background:${kp.bar}"></div></div>
+      <div class="kpi-val" style="color:${kp.bar}">${Math.round(kp.avance*100)}%</div>
+      <div class="kpi-peso">${Math.round(kp.peso*100)}%</div>
+    </div>`).join('');
+
+  // Calc viejo vs nuevo
+  const siPct=Math.round(siAvance*100);
+  const soPct=Math.round(soAvance*100);
+  document.getElementById('calcViejo').innerHTML=`
+    <div style="display:flex;flex-direction:column;gap:6px;font-size:.82rem;">
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--line)"><span>Sueldo base</span><span style="font-weight:600">$2.800.000</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--line)"><span>Base variable</span><span>$840.000</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--line)"><span>KPI: Sell-IN SAP (${siPct}%)</span><span style="color:var(--red)">${siPct}% target</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:2px solid var(--line)"><span>Variable calculada</span><span>${fmp(Math.round(bonoVar*siAvance))}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0"><span style="font-weight:700">BONO PAGADO</span><span style="font-weight:700;color:var(--red)">${fmp(k.bono_pagado)}</span></div>
+    </div>`;
+  document.getElementById('calcNuevo').innerHTML=`
+    <div style="display:flex;flex-direction:column;gap:6px;font-size:.82rem;">
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--line)"><span>Sueldo base</span><span style="font-weight:600">$2.800.000</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--line)"><span>Base variable</span><span>$840.000</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--line)"><span>KPI: Sell-OUT real (${soPct}%)</span><span style="color:var(--green)">${soPct}% target</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:2px solid var(--line)"><span>Variable calculada</span><span>${fmp(Math.round(bonoVar*soAvance))}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0"><span style="font-weight:700">BONO CORRECTO</span><span style="font-weight:700;color:var(--green)">${fmp(k.bono_correcto)}</span></div>
+    </div>`;
+
+  // Historial
+  const hist=k.hist;
+  let ht=`<thead><tr><th>Mes</th><th>Sell-OUT</th><th>Bono pagado</th><th>Bono correcto</th><th>Diferencia</th><th>Estado</th></tr></thead><tbody>`;
+  hist.forEach(h=>{
+    if(h.proyectado){
+      ht+=`<tr style="background:#f3e8ff;"><td>${h.mes}</td><td>—</td><td>—</td><td>${fmp(h.proyectado)}</td><td class="pp"><span class="pill pp">Proyectado</span></td><td><span class="pill pp">⏳ Mes en curso</span></td></tr>`;
+    } else {
+      const g=h.correcto-h.pagado;
+      ht+=`<tr class="${g<-500000?'over':g>500000?'under':''}">
+        <td>${h.mes}</td>
+        <td>${h.so.toLocaleString('es-CL')} un</td>
+        <td>${fmp(h.pagado)}</td>
+        <td>${fmp(h.correcto)}</td>
+        <td class="${g<0?'dn':'up'}" style="font-weight:700">${fm(g)}</td>
+        <td>${g<-500000?'<span class="pill pr">Sobrepago</span>':g>500000?'<span class="pill pg">Subpago</span>':'<span class="pill pa">~OK</span>'}</td>
+      </tr>`;
+    }
+  });
+  document.getElementById('histTable').innerHTML=ht+'</tbody>';
+
+  // Seal
+  document.getElementById('sealKAM').textContent=k.nombre;
+  document.getElementById('sealSO').textContent=k.hist[4].so.toLocaleString('es-CL');
+  document.getElementById('sealBono').textContent=fmp(k.hist[4].correcto);
+}
+
+// ── RRHH ─────────────────────────────────────────────────────────
+function renderRRHH(){
+  // Bandeja
+  document.getElementById('bandejaList').innerHTML=KAMS.map(k=>{
+    const g=k.gap;
+    return `<div class="aprobacion-row">
+      <div class="apr-name">${k.nombre}</div>
+      <div class="apr-details">
+        <div class="apr-detail"><span>Canal</span><strong>${k.canal}</strong></div>
+        <div class="apr-detail"><span>Bono calculado</span><strong style="color:var(--green)">${fmp(k.bono_correcto)}</strong></div>
+        <div class="apr-detail"><span>Bono anterior</span><strong style="color:var(--red)">${fmp(k.bono_pagado)}</strong></div>
+        <div class="apr-detail"><span>Diferencia</span><strong class="${g<0?'dn':'up'}">${fm(g)}</strong></div>
+      </div>
+      <div class="apr-actions">
+        <button class="btn-approve" onclick="this.textContent='✓ Aprobado';this.style.opacity='.5';this.style.cursor='default'">✓ Aprobar</button>
+        <button class="btn-reject" onclick="this.textContent='✗ Rechazado';this.style.opacity='.5'">✗ Revisar</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Alerts
+  document.getElementById('alertList').innerHTML=[
+    {t:'Andrés Castro — bono Q1 calculado sobre sell-in 58% superior al sell-out. Gap: $8.4M CLP.',c:'pr',i:'🚨'},
+    {t:'Rodrigo Morales — patrón recurrente 3 meses. Posible inflación de sell-in.',c:'pr',i:'🚨'},
+    {t:'Pablo Jiménez — 4 meses consecutivos sell-in > sell-out en +40%.',c:'pa',i:'⚠'},
+    {t:'Carolina Vega — subpago confirmado $2.4M CLP. Autorizar pago diferencia.',c:'pg',i:'✅'},
+  ].map(a=>`<div style="display:flex;gap:.5rem;font-size:.78rem;padding:.5rem;background:var(--cloud);border-radius:3px;">
+    <span>${a.i}</span>
+    <span><span class="pill ${a.c}" style="margin-right:5px">${a.c==='pr'?'Crítico':a.c==='pa'?'Alerta':'OK'}</span>${a.t}</span>
+  </div>`).join('');
+
+  // RRHH chart
+  const pagados=[78,162,97,74,80,88].map(v=>v*1000000);
+  const correctos=[49,102,62,47,51,56].map(v=>v*1000000);
+  if(charts.rrhh)charts.rrhh.destroy();
+  charts.rrhh=new Chart(document.getElementById('rrhhChart'),{type:'line',
+    data:{labels:ML,datasets:[
+      {label:'Bonos pagados',data:pagados,borderColor:'#c8202a',fill:false,tension:.35,borderWidth:2.5,pointRadius:2},
+      {label:'Bonos correctos',data:correctos,borderColor:'#0f7c4a',fill:false,tension:.35,borderWidth:2.5,pointRadius:2},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{boxWidth:11,font:{size:10},padding:10}}},
+      scales:{x:{grid:{color:'#f0f0f0'},ticks:{font:{size:9}}},
+              y:{grid:{color:'#f0f0f0'},ticks:{font:{size:9},callback:v=>Math.round(v/1000000)+'M'}}}}});
+
+  renderTransparency();
+}
+
+function renderTransparency(){
+  document.getElementById('transparencyList').innerHTML=KAMS.map(k=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line);">
+      <div>
+        <div style="font-size:.82rem;font-weight:600">${k.nombre}</div>
+        <div style="font-size:.72rem;color:var(--mid)">${k.canal}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:.75rem;font-size:.75rem;">
+        <span style="color:var(--mid)">Visor: ${visorOn?'<strong style="color:#8B2FC9">Activo</strong>':'<strong style="color:var(--red)">Desactivado</strong>'}</span>
+        <span style="color:var(--mid)">PDF sellado: <strong style="color:var(--green)">Activo</strong></span>
+        <span style="color:var(--mid)">Alertas: <strong style="color:var(--green)">Activo</strong></span>
+      </div>
+    </div>`).join('');
+}
+
+// ── INIT ─────────────────────────────────────────────────────────
+renderGM();
+buildKamChips();
+renderKAM();
+</script>
+</body>
+</html>
