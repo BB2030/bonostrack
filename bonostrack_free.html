@@ -7,130 +7,131 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --cream:#F5F2ED;
-  --cream2:#EDE8E0;
-  --ink:#1C1917;
-  --ink2:#44403C;
-  --mid:#78716C;
-  --accent:#1C1917;
-  --green:#15803D;
-  --green-bg:#F0FDF4;
-  --red:#B91C1C;
-  --red-bg:#FEF2F2;
-  --amber:#B45309;
-  --amber-bg:#FFFBEB;
-  --border:#D6D3CE;
-  --radius:10px;
+:root{
+  --cream:#F5F2ED;--cream2:#EDE8E0;--ink:#1C1917;--mid:#78716C;
+  --green:#15803D;--green-bg:#F0FDF4;--red:#B91C1C;--red-bg:#FEF2F2;
+  --amber:#B45309;--border:#D6D3CE;--radius:10px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;font-size:14px;}
-
-/* NAV */
 nav{background:var(--ink);padding:0 2rem;height:54px;display:flex;align-items:center;justify-content:space-between;}
-.logo{font-family:'Instrument Serif',serif;color:#fff;font-size:1.1rem;letter-spacing:.01em;}
+.logo{font-family:'Instrument Serif',serif;color:#fff;font-size:1.1rem;}
 .logo span{color:#A8A29E;}
-.badge{font-size:.7rem;background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);padding:3px 10px;border-radius:20px;letter-spacing:.05em;}
-
-/* HERO */
+.badge{font-size:.7rem;background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);padding:3px 10px;border-radius:20px;}
 .hero{text-align:center;padding:3.5rem 1rem 2rem;}
 .hero h1{font-family:'Instrument Serif',serif;font-size:2.4rem;line-height:1.2;font-weight:400;margin-bottom:.75rem;}
 .hero h1 em{font-style:italic;color:var(--mid);}
-.hero p{color:var(--mid);font-size:.95rem;max-width:500px;margin:0 auto 1.5rem;}
-.pill{display:inline-block;background:var(--green-bg);color:var(--green);font-size:.72rem;font-weight:500;padding:4px 12px;border-radius:20px;letter-spacing:.04em;margin-bottom:1rem;}
+.hero p{color:var(--mid);font-size:.95rem;max-width:520px;margin:0 auto 1.5rem;}
+.pill{display:inline-block;background:var(--green-bg);color:var(--green);font-size:.72rem;font-weight:500;padding:4px 12px;border-radius:20px;margin-bottom:1rem;}
+.container{max-width:920px;margin:0 auto;padding:0 1.5rem 4rem;}
 
-/* MAIN LAYOUT */
-.container{max-width:900px;margin:0 auto;padding:0 1.5rem 4rem;}
+/* REGISTRO */
+.reg-box{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:1.5rem;display:flex;gap:1rem;align-items:flex-end;flex-wrap:wrap;}
+.reg-box label{font-size:.78rem;color:var(--mid);display:block;margin-bottom:.35rem;}
+.reg-box input{border:1px solid var(--border);border-radius:8px;padding:9px 14px;font-size:.85rem;font-family:'DM Sans',sans-serif;width:260px;outline:none;}
+.reg-box input:focus{border-color:var(--ink);}
+.reg-btn{background:var(--ink);color:#fff;border:none;padding:10px 22px;border-radius:8px;font-size:.85rem;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;}
+.reg-btn:hover{background:#44403C;}
+.user-info{font-size:.8rem;color:var(--mid);background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:.6rem 1rem;display:none;}
+.user-info span{color:var(--green);font-weight:500;}
 
-/* STEPS */
-.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem;}
-.step{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;}
-.step-num{width:26px;height:26px;border-radius:50%;background:var(--ink);color:#fff;font-size:.75rem;font-weight:500;display:flex;align-items:center;justify-content:center;margin-bottom:.75rem;}
-.step h3{font-size:.82rem;font-weight:500;margin-bottom:.3rem;}
-.step p{font-size:.75rem;color:var(--mid);line-height:1.5;}
+/* CONTADOR */
+.contador{background:var(--ink);color:#fff;border-radius:var(--radius);padding:1rem 1.5rem;margin-bottom:1.5rem;display:none;align-items:center;justify-content:space-between;}
+.contador-dias{font-family:'Instrument Serif',serif;font-size:2rem;}
+.contador-dias span{font-size:.85rem;font-weight:400;opacity:.6;margin-left:.25rem;}
+.contador-barra{flex:1;margin:0 1.5rem;background:rgba(255,255,255,.15);border-radius:4px;height:6px;}
+.contador-fill{height:6px;border-radius:4px;background:#fff;transition:width .5s;}
+.contador-txt{font-size:.75rem;opacity:.7;text-align:right;white-space:nowrap;}
 
-/* UPLOAD ZONES */
-.uploads{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem;}
+/* COMPARADOR */
+.comparador{display:grid;grid-template-columns:1fr 50px 1fr;gap:0;margin-bottom:1.5rem;align-items:stretch;}
+.lado{border:1px solid var(--border);border-radius:var(--radius);background:#fff;padding:1.25rem;}
+.lado.mal{border-color:#FECACA;background:var(--red-bg);}
+.lado.bien{border-color:#BBF7D0;background:var(--green-bg);}
+.lado h3{font-size:.75rem;font-weight:500;margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.06em;}
+.lado.mal h3{color:var(--red);}
+.lado.bien h3{color:var(--green);}
+.lado p{font-size:.78rem;color:var(--mid);line-height:1.6;}
+.lado p strong{color:var(--ink);}
+.vs{display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:1.2rem;color:var(--mid);}
+
+/* UPLOADS */
+.uploads{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-bottom:1rem;}
 .upload-zone{border:1.5px dashed var(--border);border-radius:var(--radius);padding:1.5rem 1rem;text-align:center;cursor:pointer;transition:.15s;background:#fff;position:relative;}
-.upload-zone:hover{border-color:var(--ink);background:var(--cream);}
+.upload-zone:hover{border-color:var(--ink);}
 .upload-zone.loaded{border-color:var(--green);border-style:solid;background:var(--green-bg);}
 .upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
 .upload-icon{font-size:1.4rem;margin-bottom:.5rem;}
-.upload-zone h4{font-size:.8rem;font-weight:500;margin-bottom:.25rem;}
+.upload-zone h4{font-size:.82rem;font-weight:500;margin-bottom:.25rem;}
 .upload-zone p{font-size:.72rem;color:var(--mid);}
 .upload-zone.loaded p{color:var(--green);}
-.upload-zone .filename{font-size:.7rem;color:var(--green);font-weight:500;margin-top:.35rem;word-break:break-all;}
+.filename{font-size:.7rem;color:var(--green);font-weight:500;margin-top:.35rem;}
 
-/* TEMPLATE LINKS */
-.templates{display:flex;gap:1rem;justify-content:center;margin-bottom:2rem;flex-wrap:wrap;}
-.tpl-btn{font-size:.75rem;color:var(--mid);border:1px solid var(--border);padding:5px 14px;border-radius:20px;cursor:pointer;background:#fff;transition:.15s;font-family:'DM Sans',sans-serif;}
-.tpl-btn:hover{background:var(--cream2);color:var(--ink);}
+/* NC */
+.nc-box{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1.5rem;}
+.nc-box h4{font-size:.8rem;font-weight:500;margin-bottom:.75rem;}
+.nc-row{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;}
+.nc-row label{font-size:.78rem;color:var(--mid);white-space:nowrap;}
+.nc-row input[type=range]{flex:1;min-width:120px;}
+.nc-val{font-size:.82rem;font-weight:500;min-width:36px;}
+.nc-tip{font-size:.72rem;color:var(--mid);margin-top:.5rem;}
 
-/* CALCULATE BTN */
+/* PREGUNTA */
+.pregunta-box{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1.5rem;display:none;}
+.pregunta-box h4{font-size:.82rem;font-weight:500;margin-bottom:.75rem;}
+.pregunta-opciones{display:flex;gap:.5rem;flex-wrap:wrap;}
+.pregunta-opt{border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-size:.78rem;cursor:pointer;background:#fff;font-family:'DM Sans',sans-serif;transition:.15s;}
+.pregunta-opt:hover{border-color:var(--ink);background:var(--cream);}
+.pregunta-opt.sel{border-color:var(--green);background:var(--green-bg);color:var(--green);}
+
+.templates{display:flex;gap:.75rem;margin-bottom:1.5rem;flex-wrap:wrap;}
+.tpl-btn{font-size:.75rem;color:var(--mid);border:1px solid var(--border);padding:5px 14px;border-radius:20px;cursor:pointer;background:#fff;font-family:'DM Sans',sans-serif;transition:.15s;}
+.tpl-btn:hover{background:var(--cream2);}
 .calc-wrap{text-align:center;margin-bottom:2.5rem;}
-.calc-btn{background:var(--ink);color:#fff;border:none;padding:13px 40px;border-radius:8px;font-size:.9rem;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.15s;letter-spacing:.01em;}
+.calc-btn{background:var(--ink);color:#fff;border:none;padding:13px 40px;border-radius:8px;font-size:.9rem;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.15s;}
 .calc-btn:hover{background:#44403C;}
 .calc-btn:disabled{background:var(--border);cursor:not-allowed;color:var(--mid);}
 .demo-btn{background:none;border:1px solid var(--border);color:var(--ink);padding:13px 28px;border-radius:8px;font-size:.85rem;cursor:pointer;font-family:'DM Sans',sans-serif;margin-left:.75rem;transition:.15s;}
 .demo-btn:hover{background:var(--cream2);}
 
-/* RESULTS */
+/* MURO DÍA 100 */
+.muro{display:none;background:var(--ink);color:#fff;border-radius:var(--radius);padding:2.5rem;text-align:center;margin-bottom:2rem;}
+.muro h2{font-family:'Instrument Serif',serif;font-size:2rem;font-weight:400;margin-bottom:.75rem;}
+.muro p{color:rgba(255,255,255,.65);font-size:.9rem;margin-bottom:.5rem;}
+.muro .gap-num{font-family:'Instrument Serif',serif;font-size:2.5rem;color:#FCD34D;margin:1rem 0;}
+.muro-btns{display:flex;gap:1rem;justify-content:center;margin-top:1.5rem;flex-wrap:wrap;}
+.muro-pro{background:#fff;color:var(--ink);border:none;padding:13px 32px;border-radius:8px;font-size:.9rem;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.muro-canje{background:none;border:1px solid rgba(255,255,255,.3);color:#fff;padding:13px 24px;border-radius:8px;font-size:.85rem;cursor:pointer;font-family:'DM Sans',sans-serif;}
+
 .results{display:none;}
 .results.show{display:block;}
-
-.result-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:gap;}
+.result-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;}
 .result-header h2{font-family:'Instrument Serif',serif;font-size:1.5rem;font-weight:400;}
-.download-btn{background:#fff;border:1px solid var(--border);padding:9px 20px;border-radius:8px;font-size:.8rem;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:.4rem;transition:.15s;}
-.download-btn:hover{background:var(--cream2);}
-
-/* SUMMARY CARDS */
 .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:1.5rem;}
 .scard{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1rem;}
 .scard .val{font-family:'Instrument Serif',serif;font-size:1.6rem;font-weight:400;line-height:1;}
 .scard .val.red{color:var(--red);}
 .scard .val.green{color:var(--green);}
-.scard .val.amber{color:var(--amber);}
 .scard .lbl{font-size:.72rem;color:var(--mid);margin-top:.3rem;}
-
-/* TABLE */
 .table-wrap{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:1.5rem;}
 table{width:100%;border-collapse:collapse;}
 thead{background:var(--ink);}
-thead th{color:#fff;font-size:.75rem;font-weight:500;padding:.75rem 1rem;text-align:left;letter-spacing:.03em;}
+thead th{color:#fff;font-size:.72rem;font-weight:500;padding:.7rem .75rem;text-align:left;letter-spacing:.03em;}
 tbody tr{border-bottom:1px solid var(--border);}
 tbody tr:last-child{border:none;}
 tbody tr:hover{background:var(--cream);}
-td{padding:.7rem 1rem;font-size:.82rem;}
+td{padding:.65rem .75rem;font-size:.8rem;}
 td.name{font-weight:500;}
 td.num{font-variant-numeric:tabular-nums;text-align:right;}
 td.diff.pos{color:var(--green);font-weight:500;}
 td.diff.neg{color:var(--red);font-weight:500;}
-
-/* SEMAFORO */
-.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;}
 .dot.green{background:var(--green);}
 .dot.red{background:var(--red);}
 .dot.amber{background:var(--amber);}
-
-/* SEAL */
-.seal{background:var(--cream2);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.25rem;display:flex;align-items:center;gap:1rem;margin-bottom:2rem;}
-.seal-icon{font-size:1.5rem;flex-shrink:0;}
-.seal-text h4{font-size:.82rem;font-weight:500;margin-bottom:.2rem;}
-.seal-text p{font-size:.75rem;color:var(--mid);}
-
-/* CTA */
-.cta-box{background:var(--ink);color:#fff;border-radius:var(--radius);padding:2rem;text-align:center;}
-.cta-box h3{font-family:'Instrument Serif',serif;font-size:1.4rem;font-weight:400;margin-bottom:.5rem;}
-.cta-box p{font-size:.85rem;color:rgba(255,255,255,.6);margin-bottom:1.25rem;}
-.cta-box a{background:#fff;color:var(--ink);padding:11px 28px;border-radius:8px;font-size:.85rem;font-weight:500;text-decoration:none;display:inline-block;}
-
-/* ERROR */
+.nota{font-size:.75rem;color:var(--mid);background:var(--cream2);border-radius:8px;padding:.75rem 1rem;margin-bottom:1.5rem;}
 .error-msg{background:var(--red-bg);border:1px solid #FECACA;border-radius:8px;padding:.75rem 1rem;font-size:.8rem;color:var(--red);margin-bottom:1rem;display:none;}
-
-@media(max-width:640px){
-  .steps,.uploads,.summary{grid-template-columns:1fr;}
-  .hero h1{font-size:1.8rem;}
-}
+@media(max-width:640px){.comparador{grid-template-columns:1fr;}.vs{display:none;}.uploads,.summary{grid-template-columns:1fr;}.hero h1{font-size:1.8rem;}}
 </style>
 </head>
 <body>
@@ -141,29 +142,62 @@ td.diff.neg{color:var(--red);font-weight:500;}
 </nav>
 
 <div class="hero">
-  <div class="pill">Sin registro · Sin tarjeta · 100% privado</div>
-  <h1>¿Cuánto estás<br>pagando <em>de más?</em></h1>
-  <p>Sube tus archivos Excel. En segundos sabes si los bonos de tus KAMs se calcularon sobre el número correcto.</p>
+  <div class="pill">Sin tarjeta · 100% privado</div>
+  <h1>Lo que pagaste<br>vs lo que <em>debías</em> pagar</h1>
+  <p>Sube tu Excel. Ve el gap. Entiende cuánto se está pagando de más — o de menos — en los bonos de tus KAMs.</p>
 </div>
 
 <div class="container">
 
-  <!-- STEPS -->
-  <div class="steps">
-    <div class="step">
-      <div class="step-num">1</div>
-      <h3>Sell-in SAP</h3>
-      <p>El número que Finanzas le manda a RRHH. Generalmente un reporte VF05 o similar.</p>
+  <!-- REGISTRO -->
+  <div class="reg-box" id="regBox">
+    <div>
+      <label>Tu email — para guardar tus resultados</label>
+      <input type="email" id="emailInput" placeholder="tu@empresa.cl" onkeydown="if(event.key==='Enter')registrar()">
     </div>
-    <div class="step">
-      <div class="step-num">2</div>
-      <h3>Notas de crédito</h3>
-      <p>Devoluciones, aportes de precio, fees del retailer. Los que llegan 30-60 días después.</p>
+    <button class="reg-btn" onclick="registrar()">Empezar gratis →</button>
+  </div>
+  <div class="user-info" id="userInfo"></div>
+
+  <!-- CONTADOR 100 DÍAS -->
+  <div class="contador" id="contador">
+    <div>
+      <div class="contador-dias" id="contadorNum">0 <span>días</span></div>
+      <div style="font-size:.72rem;opacity:.6;margin-top:.1rem;">período gratuito</div>
     </div>
-    <div class="step">
-      <div class="step-num">3</div>
-      <h3>Estructura de bono</h3>
-      <p>Meta de venta por KAM y porcentaje de bono según cumplimiento.</p>
+    <div class="contador-barra"><div class="contador-fill" id="contadorFill"></div></div>
+    <div class="contador-txt" id="contadorTxt"></div>
+  </div>
+
+  <!-- MURO DÍA 100 -->
+  <div class="muro" id="muro">
+    <h2>Han pasado 100 días.</h2>
+    <p>En ese tiempo detectamos un gap acumulado de</p>
+    <div class="gap-num" id="muroGap">$0</div>
+    <p>en los bonos de tus KAMs.</p>
+    <p style="margin-top:.75rem;font-size:.82rem;">¿Tu empresa puede seguir sin saberlo?</p>
+    <div class="muro-btns">
+      <button class="muro-pro" onclick="window.location.href='https://www.bonostrack.com/#demo'">Activar Pro →</button>
+      <button class="muro-canje" onclick="mostrarCanje()">Dame 30 días más — cuéntame de tu empresa</button>
+    </div>
+  </div>
+
+  <!-- PREGUNTA PROGRESIVA -->
+  <div class="pregunta-box" id="preguntaBox">
+    <h4 id="preguntaTxt"></h4>
+    <div class="pregunta-opciones" id="preguntaOpts"></div>
+  </div>
+
+  <!-- COMPARADOR -->
+  <div class="comparador">
+    <div class="lado mal">
+      <h3>Como lo hace RRHH hoy</h3>
+      <p>Finanzas manda el <strong>sell-in bruto</strong> por email. RRHH lo ingresa en su planilla. Se paga el bono. Las notas de crédito llegan <strong>30–60 días después</strong>. Nadie recalcula.</p>
+    </div>
+    <div class="vs">vs</div>
+    <div class="lado bien">
+      <h3>Con el sell-in real</h3>
+      <p>El mismo esquema, pero sobre el <strong>sell-in neto</strong> — descontadas NCs, aportes de precio y fees de retailer. El cumplimiento cambia. El tramo cambia. <strong>El bono puede ser completamente distinto.</strong></p>
     </div>
   </div>
 
@@ -172,64 +206,59 @@ td.diff.neg{color:var(--red);font-weight:500;}
     <div class="upload-zone" id="zone1">
       <input type="file" accept=".xlsx,.xls,.csv" onchange="handleFile(this,1)">
       <div class="upload-icon">📊</div>
-      <h4>Sell-in SAP</h4>
+      <h4>Sell-in SAP (bruto)</h4>
       <p>Columnas: KAM · Sell-in CLP</p>
       <div class="filename" id="name1"></div>
     </div>
     <div class="upload-zone" id="zone2">
       <input type="file" accept=".xlsx,.xls,.csv" onchange="handleFile(this,2)">
-      <div class="upload-icon">📋</div>
-      <h4>Notas de crédito</h4>
-      <p>Columnas: KAM · NC CLP</p>
-      <div class="filename" id="name2"></div>
-    </div>
-    <div class="upload-zone" id="zone3">
-      <input type="file" accept=".xlsx,.xls,.csv" onchange="handleFile(this,3)">
       <div class="upload-icon">🎯</div>
       <h4>Estructura de bono</h4>
-      <p>Columnas: KAM · Meta CLP · % bono</p>
-      <div class="filename" id="name3"></div>
+      <p>Columnas: KAM · Meta CLP · Bono base CLP</p>
+      <div class="filename" id="name2"></div>
     </div>
   </div>
 
-  <!-- TEMPLATES -->
-  <div class="templates">
-    <button class="tpl-btn" onclick="downloadTemplate(1)">⬇ Plantilla Sell-in</button>
-    <button class="tpl-btn" onclick="downloadTemplate(2)">⬇ Plantilla NC</button>
-    <button class="tpl-btn" onclick="downloadTemplate(3)">⬇ Plantilla Bono</button>
+  <!-- NC SLIDER -->
+  <div class="nc-box">
+    <h4>Estimación de notas de crédito</h4>
+    <div class="nc-row">
+      <label>¿Qué % del sell-in vuelve como NC?</label>
+      <input type="range" min="5" max="50" value="20" step="1" id="ncPct" oninput="document.getElementById('ncVal').textContent=this.value+'%'">
+      <span class="nc-val" id="ncVal">20%</span>
+    </div>
+    <div class="nc-tip">Electrohogar Chile: 15–35% · Farma: 8–15% · Consumo masivo: 10–25%</div>
   </div>
 
-  <!-- ERROR -->
+  <div class="templates">
+    <button class="tpl-btn" onclick="downloadTemplate(1)">⬇ Plantilla Sell-in</button>
+    <button class="tpl-btn" onclick="downloadTemplate(2)">⬇ Plantilla Bono</button>
+  </div>
+
   <div class="error-msg" id="errMsg"></div>
 
-  <!-- BUTTONS -->
   <div class="calc-wrap">
-    <button class="calc-btn" id="calcBtn" onclick="calcular()" disabled>Calcular bonos</button>
+    <button class="calc-btn" id="calcBtn" onclick="calcular()" disabled>Ver el gap</button>
     <button class="demo-btn" onclick="loadDemo()">Ver ejemplo con datos demo</button>
   </div>
 
-  <!-- RESULTS -->
   <div class="results" id="results">
-
     <div class="result-header">
-      <h2>Resultado del análisis</h2>
-      <button class="download-btn" onclick="window.print()">🖨 Imprimir / PDF</button>
+      <h2>Gap detectado</h2>
+      <button onclick="window.print()" style="background:#fff;border:1px solid var(--border);padding:9px 20px;border-radius:8px;font-size:.8rem;cursor:pointer;font-family:'DM Sans',sans-serif;">🖨 Imprimir</button>
     </div>
-
-    <!-- SUMMARY -->
     <div class="summary" id="summary"></div>
-
-    <!-- TABLE -->
+    <div class="nota" id="notaNC"></div>
     <div class="table-wrap">
       <table>
         <thead>
           <tr>
             <th>KAM</th>
             <th style="text-align:right">Sell-in bruto</th>
-            <th style="text-align:right">Notas crédito</th>
+            <th style="text-align:right">NC estimada</th>
             <th style="text-align:right">Sell-in neto</th>
-            <th style="text-align:right">Bono calculado</th>
-            <th style="text-align:right">Bono correcto</th>
+            <th style="text-align:right">Cumpl. hoy · Tramo · Bono pagado</th>
+            <th style="text-align:right">Cumpl. real · Tramo · Bono correcto</th>
             <th style="text-align:right">Diferencia</th>
             <th>Estado</th>
           </tr>
@@ -237,200 +266,288 @@ td.diff.neg{color:var(--red);font-weight:500;}
         <tbody id="tableBody"></tbody>
       </table>
     </div>
-
-    <!-- SEAL -->
-    <div class="seal">
-      <div class="seal-icon">🔒</div>
-      <div class="seal-text">
-        <h4>Análisis sellado — <span id="sealDate"></span></h4>
-        <p>Este resultado fue generado localmente en tu navegador. Ningún dato salió de tu computador. La versión completa de Bonostrack genera un PDF con firma digital para disputas formales.</p>
-      </div>
-    </div>
-
-    <!-- CTA -->
-    <div class="cta-box">
-      <h3>¿Quieres el PDF sellado con firma digital?</h3>
-      <p>La versión completa cruza sell-out real de portales B2B, genera el acta del mes 31 y conecta con Buk / Talana directamente.</p>
-      <a href="https://www.bonostrack.com/#demo">Solicitar demo gratuita →</a>
-    </div>
-
   </div>
 
 </div>
 
 <script>
-const data = {sell:[],nc:[],bono:[]};
-const loaded = {1:false,2:false,3:false};
+const SB_URL='https://sohuixzuwkjkliolmdco.supabase.co';
+const SB_KEY='sb_publishable_5M6fH9jybUen2F10hlm80A__aD_fCEY';
 
+const data={sell:[],bono:[]};
+const loaded={1:false,2:false};
+let currentUser=null;
+let gapAcumulado=0;
+
+// ── SUPABASE HELPERS ──────────────────────────────────────
+async function sbFetch(path,method='GET',body=null){
+  const opts={method,headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=representation'}};
+  if(body) opts.body=JSON.stringify(body);
+  const r=await fetch(SB_URL+path,opts);
+  return r.ok?r.json():null;
+}
+
+// ── REGISTRO ──────────────────────────────────────────────
+async function registrar(){
+  const email=document.getElementById('emailInput').value.trim();
+  if(!email||!email.includes('@')){showError('Ingresa un email válido.');return;}
+
+  // Buscar usuario existente
+  let users=await sbFetch('/rest/v1/bt_users?email=eq.'+encodeURIComponent(email)+'&select=*');
+  let user=users&&users.length?users[0]:null;
+
+  if(!user){
+    // Crear usuario nuevo
+    const created=await sbFetch('/rest/v1/bt_users','POST',{email,plan:'free',activo:true});
+    user=created&&created.length?created[0]:null;
+    if(!user){showError('Error al crear cuenta. Intenta de nuevo.');return;}
+  }
+
+  // Calcular días desde registro
+  const dias=Math.floor((Date.now()-new Date(user.fecha_registro).getTime())/(1000*60*60*24));
+  user._dias=dias;
+
+  currentUser=user;
+  mostrarUsuario(user,dias);
+  mostrarContador(dias);
+  verificarMuro(user,dias);
+  mostrarPreguntaProgresiva(dias,user);
+}
+
+function mostrarUsuario(user,dias){
+  document.getElementById('regBox').style.display='none';
+  const info=document.getElementById('userInfo');
+  info.style.display='block';
+  info.innerHTML=`<span>${user.email}</span> · día ${dias} de 100 · <a href="#" onclick="cerrarSesion()" style="color:var(--mid)">cambiar</a>`;
+}
+
+function cerrarSesion(){
+  currentUser=null;
+  document.getElementById('regBox').style.display='flex';
+  document.getElementById('userInfo').style.display='none';
+  document.getElementById('contador').style.display='none';
+  document.getElementById('muro').style.display='none';
+  document.getElementById('preguntaBox').style.display='none';
+}
+
+function mostrarContador(dias){
+  if(dias>=100) return;
+  const el=document.getElementById('contador');
+  el.style.display='flex';
+  document.getElementById('contadorNum').innerHTML=dias+' <span>días</span>';
+  document.getElementById('contadorFill').style.width=Math.min(dias,100)+'%';
+  const restantes=100-dias;
+  document.getElementById('contadorTxt').textContent=restantes+' días restantes gratis';
+}
+
+function verificarMuro(user,dias){
+  if(dias<100) return;
+  document.getElementById('contador').style.display='none';
+  document.getElementById('muro').style.display='block';
+  document.getElementById('muroGap').textContent=new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(gapAcumulado||47300000);
+}
+
+// ── PREGUNTAS PROGRESIVAS ─────────────────────────────────
+const PREGUNTAS=[
+  {dia:1, txt:'¿En qué industria trabajas?', opts:['Electrohogar','Consumo masivo','Farma','Minería','Logística','Otra'], campo:'industria'},
+  {dia:30,txt:'¿Cuántos KAMs tienes en tu equipo?', opts:['1-3','4-8','9-15','16+'], campo:'n_kams'},
+  {dia:60,txt:'¿Tu gerente ya vio este análisis?', opts:['Sí','No todavía','Quiero compartirlo'], campo:null},
+];
+
+function mostrarPreguntaProgresiva(dias,user){
+  const p=PREGUNTAS.find(p=>dias>=p.dia&&!user[p.campo||'_respondida_'+p.dia]);
+  if(!p) return;
+  const box=document.getElementById('preguntaBox');
+  document.getElementById('preguntaTxt').textContent=p.txt;
+  const opts=document.getElementById('preguntaOpts');
+  opts.innerHTML=p.opts.map(o=>`<button class="pregunta-opt" onclick="responderPregunta('${p.campo||'_resp'}','${o}',this,'${p.txt}')">${o}</button>`).join('');
+  box.style.display='block';
+}
+
+async function responderPregunta(campo,valor,btn,pregunta){
+  document.querySelectorAll('.pregunta-opt').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  if(currentUser&&currentUser.id){
+    await sbFetch('/rest/v1/bt_preguntas','POST',{user_id:currentUser.id,dia:currentUser._dias,pregunta,respuesta:valor});
+    if(campo&&campo!=='_resp'){
+      const update={};
+      if(campo==='n_kams') update.n_kams=parseInt(valor)||null;
+      else update[campo]=valor;
+      await sbFetch('/rest/v1/bt_users?id=eq.'+currentUser.id,'PATCH',update);
+      currentUser[campo]=valor;
+    }
+  }
+  setTimeout(()=>document.getElementById('preguntaBox').style.display='none',800);
+}
+
+function mostrarCanje(){
+  const empresa=prompt('¿En qué empresa trabajas?');
+  if(!empresa) return;
+  if(currentUser&&currentUser.id){
+    sbFetch('/rest/v1/bt_users?id=eq.'+currentUser.id,'PATCH',{empresa});
+  }
+  document.getElementById('muro').innerHTML='<h2 style="font-family:Instrument Serif,serif;font-weight:400;color:#fff">30 días más activados.</h2><p style="color:rgba(255,255,255,.6);margin-top:.5rem">Gracias. Seguimos.</p>';
+  setTimeout(()=>{document.getElementById('muro').style.display='none';},2500);
+}
+
+// ── ARCHIVOS ──────────────────────────────────────────────
 function fmt(n){return new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(n);}
 function fmtPct(n){return (n*100).toFixed(1)+'%';}
 
 function handleFile(input,idx){
-  const file = input.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    try {
-      const wb = XLSX.read(e.target.result,{type:'binary'});
-      const ws = wb.Sheets[wb.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json(ws,{defval:''});
-      data[idx===1?'sell':idx===2?'nc':'bono'] = rows;
-      loaded[idx] = true;
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const wb=XLSX.read(e.target.result,{type:'binary'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const rows=XLSX.utils.sheet_to_json(ws,{defval:''});
+      if(idx===1) data.sell=rows; else data.bono=rows;
+      loaded[idx]=true;
       document.getElementById('zone'+idx).classList.add('loaded');
-      document.getElementById('name'+idx).textContent = '✓ '+file.name;
-      document.querySelector('#zone'+idx+' p').textContent = rows.length+' filas cargadas';
+      document.getElementById('name'+idx).textContent='✓ '+file.name;
+      document.querySelector('#zone'+idx+' p').textContent=rows.length+' filas';
       checkReady();
-    } catch(err){showError('Error al leer el archivo '+idx+'. Asegúrate que es un Excel válido.');}
+    }catch(e){showError('Error al leer el archivo.');}
   };
   reader.readAsBinaryString(file);
 }
 
-function checkReady(){
-  document.getElementById('calcBtn').disabled = !(loaded[1]&&loaded[2]&&loaded[3]);
-}
-
-function showError(msg){
-  const el = document.getElementById('errMsg');
-  el.textContent = msg;
-  el.style.display = 'block';
-}
+function checkReady(){document.getElementById('calcBtn').disabled=!(loaded[1]&&loaded[2]);}
+function showError(msg){const el=document.getElementById('errMsg');el.textContent=msg;el.style.display='block';}
 
 function normalizeKey(row){
-  const keys = Object.keys(row);
-  const kamKey = keys.find(k=>k.toLowerCase().includes('kam')||k.toLowerCase().includes('nombre')||k.toLowerCase().includes('name'));
-  return kamKey ? String(row[kamKey]).trim() : '';
+  const keys=Object.keys(row);
+  const k=keys.find(k=>['kam','nombre','name'].some(x=>k.toLowerCase().includes(x)));
+  return k?String(row[k]).trim():'';
 }
-
-function getNum(row, ...hints){
-  const keys = Object.keys(row);
-  for(const hint of hints){
-    const k = keys.find(k=>k.toLowerCase().includes(hint.toLowerCase()));
-    if(k) return parseFloat(String(row[k]).replace(/[^0-9.-]/g,''))||0;
-  }
-  const nums = keys.filter(k=>!k.toLowerCase().includes('kam')&&!k.toLowerCase().includes('nombre'));
-  if(nums.length) return parseFloat(String(row[nums[0]]).replace(/[^0-9.-]/g,''))||0;
+function getNum(row,...hints){
+  const keys=Object.keys(row);
+  for(const h of hints){const k=keys.find(k=>k.toLowerCase().includes(h.toLowerCase()));if(k)return parseFloat(String(row[k]).replace(/[^0-9.-]/g,''))||0;}
   return 0;
 }
 
-function calcular(){
-  document.getElementById('errMsg').style.display='none';
-
-  const sellMap={}, ncMap={}, bonoMap={};
-
-  data.sell.forEach(r=>{
-    const kam = normalizeKey(r);
-    if(kam) sellMap[kam]=(sellMap[kam]||0)+getNum(r,'sell','venta','monto','clp','amount');
-  });
-  data.nc.forEach(r=>{
-    const kam = normalizeKey(r);
-    if(kam) ncMap[kam]=(ncMap[kam]||0)+getNum(r,'nc','nota','credito','descuento','monto','clp');
-  });
-  data.bono.forEach(r=>{
-    const kam = normalizeKey(r);
-    if(!kam) return;
-    const meta = getNum(r,'meta','target','objetivo','cuota');
-    const pct = getNum(r,'%','pct','porcentaje','bono','tasa','rate')/100 || 0.03;
-    bonoMap[kam]={meta,pct};
-  });
-
-  const kams = [...new Set([...Object.keys(sellMap),...Object.keys(bonoMap)])];
-  if(!kams.length){showError('No se encontraron KAMs en los archivos. Revisa que la primera columna se llame "KAM" o "Nombre".');return;}
-
-  const rows = kams.map(kam=>{
-    const sellBruto = sellMap[kam]||0;
-    const nc = ncMap[kam]||0;
-    const sellNeto = sellBruto - nc;
-    const {meta=sellBruto*0.9, pct=0.03} = bonoMap[kam]||{};
-    const bonoCal = sellBruto * pct;
-    const bonoCor = sellNeto * pct;
-    const diff = bonoCor - bonoCal;
-    return {kam,sellBruto,nc,sellNeto,bonoCal,bonoCor,diff,meta,pct};
-  });
-
-  renderResults(rows);
+// TRAMOS CHILE
+function multiplicador(c){
+  if(c<0.70)return 0;
+  if(c<1.00)return(c-0.70)/0.30;
+  if(c<1.10)return 1.0;
+  if(c<1.30)return 1.25;
+  return 1.5;
+}
+function tramoLabel(c){
+  if(c<0.70)return{txt:'Bajo mínimo',color:'var(--red)'};
+  if(c<1.00)return{txt:'Parcial',color:'var(--amber)'};
+  if(c<1.10)return{txt:'Completo',color:'var(--green)'};
+  if(c<1.30)return{txt:'×1.25',color:'var(--green)'};
+  return{txt:'×1.5',color:'var(--green)'};
 }
 
-function renderResults(rows){
-  const totalSobrepago = rows.filter(r=>r.diff<0).reduce((s,r)=>s+Math.abs(r.diff),0);
-  const totalSubpago = rows.filter(r=>r.diff>0).reduce((s,r)=>s+r.diff,0);
-  const kamsErr = rows.filter(r=>Math.abs(r.diff)/Math.max(r.bonoCal,1)>0.05).length;
+async function calcular(){
+  document.getElementById('errMsg').style.display='none';
+  const ncPct=parseInt(document.getElementById('ncPct').value)/100;
+  const sellMap={},bonoMap={};
+  data.sell.forEach(r=>{const k=normalizeKey(r);if(k)sellMap[k]=(sellMap[k]||0)+getNum(r,'sell','venta','monto','clp','amount');});
+  data.bono.forEach(r=>{const k=normalizeKey(r);if(!k)return;bonoMap[k]={meta:getNum(r,'meta','target','objetivo','cuota'),bonoBase:getNum(r,'bono','base','monto')};});
+  const kams=[...new Set([...Object.keys(sellMap),...Object.keys(bonoMap)])];
+  if(!kams.length){showError('No se encontraron KAMs. Revisa que la primera columna se llame "KAM".');return;}
 
-  document.getElementById('summary').innerHTML = `
-    <div class="scard"><div class="val red">${fmt(totalSobrepago)}</div><div class="lbl">Sobrepago detectado</div></div>
-    <div class="scard"><div class="val amber">${fmt(totalSubpago)}</div><div class="lbl">Subpago detectado</div></div>
+  const rows=kams.map(kam=>{
+    const sellBruto=sellMap[kam]||0;
+    const nc=sellBruto*ncPct;
+    const sellNeto=sellBruto-nc;
+    const{meta=sellBruto*0.9,bonoBase=sellBruto*0.03}=bonoMap[kam]||{};
+    const cumplMal=meta>0?sellBruto/meta:1;
+    const bonoPagado=bonoBase*multiplicador(cumplMal);
+    const cumplBien=meta>0?sellNeto/meta:1;
+    const bonoCorrecto=bonoBase*multiplicador(cumplBien);
+    return{kam,sellBruto,nc,sellNeto,meta,bonoBase,cumplMal,bonoPagado,cumplBien,bonoCorrecto,diff:bonoCorrecto-bonoPagado};
+  });
+
+  const sobrepago=rows.filter(r=>r.diff<0).reduce((s,r)=>s+Math.abs(r.diff),0);
+  const subpago=rows.filter(r=>r.diff>0).reduce((s,r)=>s+r.diff,0);
+  gapAcumulado+=sobrepago+subpago;
+
+  // Guardar en Supabase si hay usuario
+  if(currentUser&&currentUser.id){
+    await sbFetch('/rest/v1/bt_usos','POST',{
+      user_id:currentUser.id,
+      gap_total:Math.round(sobrepago+subpago),
+      sobrepago:Math.round(sobrepago),
+      subpago:Math.round(subpago),
+      n_kams:rows.length,
+      n_incorrectos:rows.filter(r=>Math.abs(r.diff)/Math.max(r.bonoPagado,1)>0.05).length,
+      nc_pct:ncPct
+    });
+  }
+
+  renderResults(rows,ncPct);
+}
+
+function renderResults(rows,ncPct){
+  const sobrepago=rows.filter(r=>r.diff<0).reduce((s,r)=>s+Math.abs(r.diff),0);
+  const subpago=rows.filter(r=>r.diff>0).reduce((s,r)=>s+r.diff,0);
+  const kamsErr=rows.filter(r=>Math.abs(r.diff)/Math.max(r.bonoPagado,1)>0.05).length;
+
+  document.getElementById('summary').innerHTML=`
+    <div class="scard"><div class="val red">${fmt(sobrepago)}</div><div class="lbl">Pagado de más</div></div>
+    <div class="scard"><div class="val" style="color:var(--amber)">${fmt(subpago)}</div><div class="lbl">Pagado de menos</div></div>
     <div class="scard"><div class="val">${kamsErr} / ${rows.length}</div><div class="lbl">KAMs con bono incorrecto</div></div>
-    <div class="scard"><div class="val green">0</div><div class="lbl">Pasos manuales con Bonostrack</div></div>
+    <div class="scard"><div class="val green">${fmt(sobrepago+subpago)}</div><div class="lbl">Gap total</div></div>
   `;
 
-  const body = document.getElementById('tableBody');
-  body.innerHTML = rows.map(r=>{
-    const pctDiff = Math.abs(r.diff)/Math.max(r.bonoCal,1);
-    const estado = pctDiff<0.02?'green':pctDiff<0.1?'amber':'red';
-    const estadoTxt = pctDiff<0.02?'Correcto':pctDiff<0.1?'Revisar':'Error';
-    const diffClass = r.diff>0?'pos':'neg';
-    return `<tr>
+  document.getElementById('notaNC').textContent='Estimación basada en '+(ncPct*100).toFixed(0)+'% de NC sobre sell-in. Ajusta el slider para mayor precisión.';
+
+  document.getElementById('tableBody').innerHTML=rows.map(r=>{
+    const tM=tramoLabel(r.cumplMal),tB=tramoLabel(r.cumplBien);
+    const pctDiff=Math.abs(r.diff)/Math.max(r.bonoPagado,1);
+    const estado=pctDiff<0.02?'green':pctDiff<0.1?'amber':'red';
+    const estadoTxt=pctDiff<0.02?'Correcto':pctDiff<0.1?'Revisar':'Error';
+    return`<tr>
       <td class="name">${r.kam}</td>
       <td class="num">${fmt(r.sellBruto)}</td>
-      <td class="num" style="color:var(--red)">${r.nc?fmt(r.nc):'-'}</td>
+      <td class="num" style="color:var(--red)">${fmt(r.nc)}</td>
       <td class="num">${fmt(r.sellNeto)}</td>
-      <td class="num">${fmt(r.bonoCal)}</td>
-      <td class="num" style="font-weight:500">${fmt(r.bonoCor)}</td>
-      <td class="num diff ${diffClass}">${r.diff>=0?'+':''}${fmt(r.diff)}</td>
+      <td class="num" style="font-size:.75rem">${fmtPct(r.cumplMal)} · <span style="color:${tM.color}">${tM.txt}</span><br><b>${fmt(r.bonoPagado)}</b></td>
+      <td class="num" style="font-size:.75rem">${fmtPct(r.cumplBien)} · <span style="color:${tB.color}">${tB.txt}</span><br><b>${fmt(r.bonoCorrecto)}</b></td>
+      <td class="num diff ${r.diff>=0?'pos':'neg'}">${r.diff>=0?'+':''}${fmt(r.diff)}</td>
       <td><span class="dot ${estado}"></span>${estadoTxt}</td>
     </tr>`;
   }).join('');
 
-  document.getElementById('sealDate').textContent = new Date().toLocaleString('es-CL');
   document.getElementById('results').classList.add('show');
   document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 function loadDemo(){
-  data.sell = [
-    {KAM:'Rodrigo Muñoz',  'Sell-in CLP': 98000000},
-    {KAM:'Camila Torres',  'Sell-in CLP': 74000000},
-    {KAM:'Andrés Vera',    'Sell-in CLP': 112000000},
-    {KAM:'Valentina Ríos', 'Sell-in CLP': 65000000},
-    {KAM:'Felipe Soto',    'Sell-in CLP': 89000000},
+  data.sell=[
+    {KAM:'Rodrigo Muñoz','Sell-in CLP':98000000},
+    {KAM:'Camila Torres','Sell-in CLP':74000000},
+    {KAM:'Andrés Vera','Sell-in CLP':112000000},
+    {KAM:'Valentina Ríos','Sell-in CLP':65000000},
+    {KAM:'Felipe Soto','Sell-in CLP':89000000},
   ];
-  data.nc = [
-    {KAM:'Rodrigo Muñoz',  'NC CLP': 18700000},
-    {KAM:'Camila Torres',  'NC CLP': 4200000},
-    {KAM:'Andrés Vera',    'NC CLP': 31400000},
-    {KAM:'Valentina Ríos', 'NC CLP': 1100000},
-    {KAM:'Felipe Soto',    'NC CLP': 22800000},
+  data.bono=[
+    {KAM:'Rodrigo Muñoz','Meta CLP':90000000,'Bono base CLP':1800000},
+    {KAM:'Camila Torres','Meta CLP':80000000,'Bono base CLP':1600000},
+    {KAM:'Andrés Vera','Meta CLP':100000000,'Bono base CLP':2000000},
+    {KAM:'Valentina Ríos','Meta CLP':70000000,'Bono base CLP':1400000},
+    {KAM:'Felipe Soto','Meta CLP':85000000,'Bono base CLP':1700000},
   ];
-  data.bono = [
-    {KAM:'Rodrigo Muñoz',  'Meta CLP': 90000000, '% bono': 4},
-    {KAM:'Camila Torres',  'Meta CLP': 70000000, '% bono': 4},
-    {KAM:'Andrés Vera',    'Meta CLP': 100000000,'% bono': 4},
-    {KAM:'Valentina Ríos', 'Meta CLP': 60000000, '% bono': 4},
-    {KAM:'Felipe Soto',    'Meta CLP': 85000000, '% bono': 4},
-  ];
-  [1,2,3].forEach(i=>{
-    loaded[i]=true;
-    document.getElementById('zone'+i).classList.add('loaded');
-    const labels=['Datos demo cargados','Datos demo cargados','Datos demo cargados'];
-    document.getElementById('name'+i).textContent='✓ Ejemplo demo';
-    document.querySelector('#zone'+i+' p').textContent='5 KAMs · datos simulados';
-  });
-  checkReady();
-  calcular();
+  [1,2].forEach(i=>{loaded[i]=true;document.getElementById('zone'+i).classList.add('loaded');document.getElementById('name'+i).textContent='✓ Datos demo';document.querySelector('#zone'+i+' p').textContent='5 KAMs';});
+  checkReady();calcular();
 }
 
 function downloadTemplate(idx){
-  const templates = [
-    {name:'Plantilla_SellIn.xlsx', headers:['KAM','Sell-in CLP'], data:[['Rodrigo Muñoz',98000000],['Camila Torres',74000000]]},
-    {name:'Plantilla_NC.xlsx',     headers:['KAM','NC CLP'],      data:[['Rodrigo Muñoz',18700000],['Camila Torres',4200000]]},
-    {name:'Plantilla_Bono.xlsx',   headers:['KAM','Meta CLP','% bono'], data:[['Rodrigo Muñoz',90000000,4],['Camila Torres',70000000,4]]},
-  ];
-  const t = templates[idx-1];
-  const ws = XLSX.utils.aoa_to_sheet([t.headers,...t.data]);
-  const wb = XLSX.utils.book_new();
+  const t=[
+    {name:'Plantilla_SellIn.xlsx',h:['KAM','Sell-in CLP'],d:[['Rodrigo Muñoz',98000000],['Camila Torres',74000000]]},
+    {name:'Plantilla_Bono.xlsx',h:['KAM','Meta CLP','Bono base CLP'],d:[['Rodrigo Muñoz',90000000,1800000],['Camila Torres',80000000,1600000]]},
+  ][idx-1];
+  const ws=XLSX.utils.aoa_to_sheet([t.h,...t.d]);
+  const wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,ws,'Datos');
   XLSX.writeFile(wb,t.name);
 }
 </script>
-
 </body>
 </html>
