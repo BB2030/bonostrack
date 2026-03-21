@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bonostrack — Calculadora gratuita</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream:#F5F2ED;
+  --cream2:#EDE8E0;
+  --ink:#1C1917;
+  --ink2:#44403C;
+  --mid:#78716C;
+  --accent:#1C1917;
+  --green:#15803D;
+  --green-bg:#F0FDF4;
+  --red:#B91C1C;
+  --red-bg:#FEF2F2;
+  --amber:#B45309;
+  --amber-bg:#FFFBEB;
+  --border:#D6D3CE;
+  --radius:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;font-size:14px;}
+
+/* NAV */
+nav{background:var(--ink);padding:0 2rem;height:54px;display:flex;align-items:center;justify-content:space-between;}
+.logo{font-family:'Instrument Serif',serif;color:#fff;font-size:1.1rem;letter-spacing:.01em;}
+.logo span{color:#A8A29E;}
+.badge{font-size:.7rem;background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);padding:3px 10px;border-radius:20px;letter-spacing:.05em;}
+
+/* HERO */
+.hero{text-align:center;padding:3.5rem 1rem 2rem;}
+.hero h1{font-family:'Instrument Serif',serif;font-size:2.4rem;line-height:1.2;font-weight:400;margin-bottom:.75rem;}
+.hero h1 em{font-style:italic;color:var(--mid);}
+.hero p{color:var(--mid);font-size:.95rem;max-width:500px;margin:0 auto 1.5rem;}
+.pill{display:inline-block;background:var(--green-bg);color:var(--green);font-size:.72rem;font-weight:500;padding:4px 12px;border-radius:20px;letter-spacing:.04em;margin-bottom:1rem;}
+
+/* MAIN LAYOUT */
+.container{max-width:900px;margin:0 auto;padding:0 1.5rem 4rem;}
+
+/* STEPS */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem;}
+.step{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;}
+.step-num{width:26px;height:26px;border-radius:50%;background:var(--ink);color:#fff;font-size:.75rem;font-weight:500;display:flex;align-items:center;justify-content:center;margin-bottom:.75rem;}
+.step h3{font-size:.82rem;font-weight:500;margin-bottom:.3rem;}
+.step p{font-size:.75rem;color:var(--mid);line-height:1.5;}
+
+/* UPLOAD ZONES */
+.uploads{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem;}
+.upload-zone{border:1.5px dashed var(--border);border-radius:var(--radius);padding:1.5rem 1rem;text-align:center;cursor:pointer;transition:.15s;background:#fff;position:relative;}
+.upload-zone:hover{border-color:var(--ink);background:var(--cream);}
+.upload-zone.loaded{border-color:var(--green);border-style:solid;background:var(--green-bg);}
+.upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-icon{font-size:1.4rem;margin-bottom:.5rem;}
+.upload-zone h4{font-size:.8rem;font-weight:500;margin-bottom:.25rem;}
+.upload-zone p{font-size:.72rem;color:var(--mid);}
+.upload-zone.loaded p{color:var(--green);}
+.upload-zone .filename{font-size:.7rem;color:var(--green);font-weight:500;margin-top:.35rem;word-break:break-all;}
+
+/* TEMPLATE LINKS */
+.templates{display:flex;gap:1rem;justify-content:center;margin-bottom:2rem;flex-wrap:wrap;}
+.tpl-btn{font-size:.75rem;color:var(--mid);border:1px solid var(--border);padding:5px 14px;border-radius:20px;cursor:pointer;background:#fff;transition:.15s;font-family:'DM Sans',sans-serif;}
+.tpl-btn:hover{background:var(--cream2);color:var(--ink);}
+
+/* CALCULATE BTN */
+.calc-wrap{text-align:center;margin-bottom:2.5rem;}
+.calc-btn{background:var(--ink);color:#fff;border:none;padding:13px 40px;border-radius:8px;font-size:.9rem;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.15s;letter-spacing:.01em;}
+.calc-btn:hover{background:#44403C;}
+.calc-btn:disabled{background:var(--border);cursor:not-allowed;color:var(--mid);}
+.demo-btn{background:none;border:1px solid var(--border);color:var(--ink);padding:13px 28px;border-radius:8px;font-size:.85rem;cursor:pointer;font-family:'DM Sans',sans-serif;margin-left:.75rem;transition:.15s;}
+.demo-btn:hover{background:var(--cream2);}
+
+/* RESULTS */
+.results{display:none;}
+.results.show{display:block;}
+
+.result-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:gap;}
+.result-header h2{font-family:'Instrument Serif',serif;font-size:1.5rem;font-weight:400;}
+.download-btn{background:#fff;border:1px solid var(--border);padding:9px 20px;border-radius:8px;font-size:.8rem;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:.4rem;transition:.15s;}
+.download-btn:hover{background:var(--cream2);}
+
+/* SUMMARY CARDS */
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:1.5rem;}
+.scard{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1rem;}
+.scard .val{font-family:'Instrument Serif',serif;font-size:1.6rem;font-weight:400;line-height:1;}
+.scard .val.red{color:var(--red);}
+.scard .val.green{color:var(--green);}
+.scard .val.amber{color:var(--amber);}
+.scard .lbl{font-size:.72rem;color:var(--mid);margin-top:.3rem;}
+
+/* TABLE */
+.table-wrap{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:1.5rem;}
+table{width:100%;border-collapse:collapse;}
+thead{background:var(--ink);}
+thead th{color:#fff;font-size:.75rem;font-weight:500;padding:.75rem 1rem;text-align:left;letter-spacing:.03em;}
+tbody tr{border-bottom:1px solid var(--border);}
+tbody tr:last-child{border:none;}
+tbody tr:hover{background:var(--cream);}
+td{padding:.7rem 1rem;font-size:.82rem;}
+td.name{font-weight:500;}
+td.num{font-variant-numeric:tabular-nums;text-align:right;}
+td.diff.pos{color:var(--green);font-weight:500;}
+td.diff.neg{color:var(--red);font-weight:500;}
+
+/* SEMAFORO */
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;}
+.dot.green{background:var(--green);}
+.dot.red{background:var(--red);}
+.dot.amber{background:var(--amber);}
+
+/* SEAL */
+.seal{background:var(--cream2);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.25rem;display:flex;align-items:center;gap:1rem;margin-bottom:2rem;}
+.seal-icon{font-size:1.5rem;flex-shrink:0;}
+.seal-text h4{font-size:.82rem;font-weight:500;margin-bottom:.2rem;}
+.seal-text p{font-size:.75rem;color:var(--mid);}
+
+/* CTA */
+.cta-box{background:var(--ink);color:#fff;border-radius:var(--radius);padding:2rem;text-align:center;}
+.cta-box h3{font-family:'Instrument Serif',serif;font-size:1.4rem;font-weight:400;margin-bottom:.5rem;}
+.cta-box p{font-size:.85rem;color:rgba(255,255,255,.6);margin-bottom:1.25rem;}
+.cta-box a{background:#fff;color:var(--ink);padding:11px 28px;border-radius:8px;font-size:.85rem;font-weight:500;text-decoration:none;display:inline-block;}
+
+/* ERROR */
+.error-msg{background:var(--red-bg);border:1px solid #FECACA;border-radius:8px;padding:.75rem 1rem;font-size:.8rem;color:var(--red);margin-bottom:1rem;display:none;}
+
+@media(max-width:640px){
+  .steps,.uploads,.summary{grid-template-columns:1fr;}
+  .hero h1{font-size:1.8rem;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">bono<span>strack</span></div>
+  <div class="badge">CALCULADORA GRATUITA</div>
+</nav>
+
+<div class="hero">
+  <div class="pill">Sin registro · Sin tarjeta · 100% privado</div>
+  <h1>¿Cuánto estás<br>pagando <em>de más?</em></h1>
+  <p>Sube tus archivos Excel. En segundos sabes si los bonos de tus KAMs se calcularon sobre el número correcto.</p>
+</div>
+
+<div class="container">
+
+  <!-- STEPS -->
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <h3>Sell-in SAP</h3>
+      <p>El número que Finanzas le manda a RRHH. Generalmente un reporte VF05 o similar.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <h3>Notas de crédito</h3>
+      <p>Devoluciones, aportes de precio, fees del retailer. Los que llegan 30-60 días después.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <h3>Estructura de bono</h3>
+      <p>Meta de venta por KAM y porcentaje de bono según cumplimiento.</p>
+    </div>
+  </div>
+
+  <!-- UPLOADS -->
+  <div class="uploads">
+    <div class="upload-zone" id="zone1">
+      <input type="file" accept=".xlsx,.xls,.csv" onchange="handleFile(this,1)">
+      <div class="upload-icon">📊</div>
+      <h4>Sell-in SAP</h4>
+      <p>Columnas: KAM · Sell-in CLP</p>
+      <div class="filename" id="name1"></div>
+    </div>
+    <div class="upload-zone" id="zone2">
+      <input type="file" accept=".xlsx,.xls,.csv" onchange="handleFile(this,2)">
+      <div class="upload-icon">📋</div>
+      <h4>Notas de crédito</h4>
+      <p>Columnas: KAM · NC CLP</p>
+      <div class="filename" id="name2"></div>
+    </div>
+    <div class="upload-zone" id="zone3">
+      <input type="file" accept=".xlsx,.xls,.csv" onchange="handleFile(this,3)">
+      <div class="upload-icon">🎯</div>
+      <h4>Estructura de bono</h4>
+      <p>Columnas: KAM · Meta CLP · % bono</p>
+      <div class="filename" id="name3"></div>
+    </div>
+  </div>
+
+  <!-- TEMPLATES -->
+  <div class="templates">
+    <button class="tpl-btn" onclick="downloadTemplate(1)">⬇ Plantilla Sell-in</button>
+    <button class="tpl-btn" onclick="downloadTemplate(2)">⬇ Plantilla NC</button>
+    <button class="tpl-btn" onclick="downloadTemplate(3)">⬇ Plantilla Bono</button>
+  </div>
+
+  <!-- ERROR -->
+  <div class="error-msg" id="errMsg"></div>
+
+  <!-- BUTTONS -->
+  <div class="calc-wrap">
+    <button class="calc-btn" id="calcBtn" onclick="calcular()" disabled>Calcular bonos</button>
+    <button class="demo-btn" onclick="loadDemo()">Ver ejemplo con datos demo</button>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="results" id="results">
+
+    <div class="result-header">
+      <h2>Resultado del análisis</h2>
+      <button class="download-btn" onclick="window.print()">🖨 Imprimir / PDF</button>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="summary" id="summary"></div>
+
+    <!-- TABLE -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>KAM</th>
+            <th style="text-align:right">Sell-in bruto</th>
+            <th style="text-align:right">Notas crédito</th>
+            <th style="text-align:right">Sell-in neto</th>
+            <th style="text-align:right">Bono calculado</th>
+            <th style="text-align:right">Bono correcto</th>
+            <th style="text-align:right">Diferencia</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <!-- SEAL -->
+    <div class="seal">
+      <div class="seal-icon">🔒</div>
+      <div class="seal-text">
+        <h4>Análisis sellado — <span id="sealDate"></span></h4>
+        <p>Este resultado fue generado localmente en tu navegador. Ningún dato salió de tu computador. La versión completa de Bonostrack genera un PDF con firma digital para disputas formales.</p>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-box">
+      <h3>¿Quieres el PDF sellado con firma digital?</h3>
+      <p>La versión completa cruza sell-out real de portales B2B, genera el acta del mes 31 y conecta con Buk / Talana directamente.</p>
+      <a href="https://www.bonostrack.com/#demo">Solicitar demo gratuita →</a>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+const data = {sell:[],nc:[],bono:[]};
+const loaded = {1:false,2:false,3:false};
+
+function fmt(n){return new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(n);}
+function fmtPct(n){return (n*100).toFixed(1)+'%';}
+
+function handleFile(input,idx){
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const wb = XLSX.read(e.target.result,{type:'binary'});
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws,{defval:''});
+      data[idx===1?'sell':idx===2?'nc':'bono'] = rows;
+      loaded[idx] = true;
+      document.getElementById('zone'+idx).classList.add('loaded');
+      document.getElementById('name'+idx).textContent = '✓ '+file.name;
+      document.querySelector('#zone'+idx+' p').textContent = rows.length+' filas cargadas';
+      checkReady();
+    } catch(err){showError('Error al leer el archivo '+idx+'. Asegúrate que es un Excel válido.');}
+  };
+  reader.readAsBinaryString(file);
+}
+
+function checkReady(){
+  document.getElementById('calcBtn').disabled = !(loaded[1]&&loaded[2]&&loaded[3]);
+}
+
+function showError(msg){
+  const el = document.getElementById('errMsg');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function normalizeKey(row){
+  const keys = Object.keys(row);
+  const kamKey = keys.find(k=>k.toLowerCase().includes('kam')||k.toLowerCase().includes('nombre')||k.toLowerCase().includes('name'));
+  return kamKey ? String(row[kamKey]).trim() : '';
+}
+
+function getNum(row, ...hints){
+  const keys = Object.keys(row);
+  for(const hint of hints){
+    const k = keys.find(k=>k.toLowerCase().includes(hint.toLowerCase()));
+    if(k) return parseFloat(String(row[k]).replace(/[^0-9.-]/g,''))||0;
+  }
+  const nums = keys.filter(k=>!k.toLowerCase().includes('kam')&&!k.toLowerCase().includes('nombre'));
+  if(nums.length) return parseFloat(String(row[nums[0]]).replace(/[^0-9.-]/g,''))||0;
+  return 0;
+}
+
+function calcular(){
+  document.getElementById('errMsg').style.display='none';
+
+  const sellMap={}, ncMap={}, bonoMap={};
+
+  data.sell.forEach(r=>{
+    const kam = normalizeKey(r);
+    if(kam) sellMap[kam]=(sellMap[kam]||0)+getNum(r,'sell','venta','monto','clp','amount');
+  });
+  data.nc.forEach(r=>{
+    const kam = normalizeKey(r);
+    if(kam) ncMap[kam]=(ncMap[kam]||0)+getNum(r,'nc','nota','credito','descuento','monto','clp');
+  });
+  data.bono.forEach(r=>{
+    const kam = normalizeKey(r);
+    if(!kam) return;
+    const meta = getNum(r,'meta','target','objetivo','cuota');
+    const pct = getNum(r,'%','pct','porcentaje','bono','tasa','rate')/100 || 0.03;
+    bonoMap[kam]={meta,pct};
+  });
+
+  const kams = [...new Set([...Object.keys(sellMap),...Object.keys(bonoMap)])];
+  if(!kams.length){showError('No se encontraron KAMs en los archivos. Revisa que la primera columna se llame "KAM" o "Nombre".');return;}
+
+  const rows = kams.map(kam=>{
+    const sellBruto = sellMap[kam]||0;
+    const nc = ncMap[kam]||0;
+    const sellNeto = sellBruto - nc;
+    const {meta=sellBruto*0.9, pct=0.03} = bonoMap[kam]||{};
+    const bonoCal = sellBruto * pct;
+    const bonoCor = sellNeto * pct;
+    const diff = bonoCor - bonoCal;
+    return {kam,sellBruto,nc,sellNeto,bonoCal,bonoCor,diff,meta,pct};
+  });
+
+  renderResults(rows);
+}
+
+function renderResults(rows){
+  const totalSobrepago = rows.filter(r=>r.diff<0).reduce((s,r)=>s+Math.abs(r.diff),0);
+  const totalSubpago = rows.filter(r=>r.diff>0).reduce((s,r)=>s+r.diff,0);
+  const kamsErr = rows.filter(r=>Math.abs(r.diff)/Math.max(r.bonoCal,1)>0.05).length;
+
+  document.getElementById('summary').innerHTML = `
+    <div class="scard"><div class="val red">${fmt(totalSobrepago)}</div><div class="lbl">Sobrepago detectado</div></div>
+    <div class="scard"><div class="val amber">${fmt(totalSubpago)}</div><div class="lbl">Subpago detectado</div></div>
+    <div class="scard"><div class="val">${kamsErr} / ${rows.length}</div><div class="lbl">KAMs con bono incorrecto</div></div>
+    <div class="scard"><div class="val green">0</div><div class="lbl">Pasos manuales con Bonostrack</div></div>
+  `;
+
+  const body = document.getElementById('tableBody');
+  body.innerHTML = rows.map(r=>{
+    const pctDiff = Math.abs(r.diff)/Math.max(r.bonoCal,1);
+    const estado = pctDiff<0.02?'green':pctDiff<0.1?'amber':'red';
+    const estadoTxt = pctDiff<0.02?'Correcto':pctDiff<0.1?'Revisar':'Error';
+    const diffClass = r.diff>0?'pos':'neg';
+    return `<tr>
+      <td class="name">${r.kam}</td>
+      <td class="num">${fmt(r.sellBruto)}</td>
+      <td class="num" style="color:var(--red)">${r.nc?fmt(r.nc):'-'}</td>
+      <td class="num">${fmt(r.sellNeto)}</td>
+      <td class="num">${fmt(r.bonoCal)}</td>
+      <td class="num" style="font-weight:500">${fmt(r.bonoCor)}</td>
+      <td class="num diff ${diffClass}">${r.diff>=0?'+':''}${fmt(r.diff)}</td>
+      <td><span class="dot ${estado}"></span>${estadoTxt}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('sealDate').textContent = new Date().toLocaleString('es-CL');
+  document.getElementById('results').classList.add('show');
+  document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function loadDemo(){
+  data.sell = [
+    {KAM:'Rodrigo Muñoz',  'Sell-in CLP': 98000000},
+    {KAM:'Camila Torres',  'Sell-in CLP': 74000000},
+    {KAM:'Andrés Vera',    'Sell-in CLP': 112000000},
+    {KAM:'Valentina Ríos', 'Sell-in CLP': 65000000},
+    {KAM:'Felipe Soto',    'Sell-in CLP': 89000000},
+  ];
+  data.nc = [
+    {KAM:'Rodrigo Muñoz',  'NC CLP': 18700000},
+    {KAM:'Camila Torres',  'NC CLP': 4200000},
+    {KAM:'Andrés Vera',    'NC CLP': 31400000},
+    {KAM:'Valentina Ríos', 'NC CLP': 1100000},
+    {KAM:'Felipe Soto',    'NC CLP': 22800000},
+  ];
+  data.bono = [
+    {KAM:'Rodrigo Muñoz',  'Meta CLP': 90000000, '% bono': 4},
+    {KAM:'Camila Torres',  'Meta CLP': 70000000, '% bono': 4},
+    {KAM:'Andrés Vera',    'Meta CLP': 100000000,'% bono': 4},
+    {KAM:'Valentina Ríos', 'Meta CLP': 60000000, '% bono': 4},
+    {KAM:'Felipe Soto',    'Meta CLP': 85000000, '% bono': 4},
+  ];
+  [1,2,3].forEach(i=>{
+    loaded[i]=true;
+    document.getElementById('zone'+i).classList.add('loaded');
+    const labels=['Datos demo cargados','Datos demo cargados','Datos demo cargados'];
+    document.getElementById('name'+i).textContent='✓ Ejemplo demo';
+    document.querySelector('#zone'+i+' p').textContent='5 KAMs · datos simulados';
+  });
+  checkReady();
+  calcular();
+}
+
+function downloadTemplate(idx){
+  const templates = [
+    {name:'Plantilla_SellIn.xlsx', headers:['KAM','Sell-in CLP'], data:[['Rodrigo Muñoz',98000000],['Camila Torres',74000000]]},
+    {name:'Plantilla_NC.xlsx',     headers:['KAM','NC CLP'],      data:[['Rodrigo Muñoz',18700000],['Camila Torres',4200000]]},
+    {name:'Plantilla_Bono.xlsx',   headers:['KAM','Meta CLP','% bono'], data:[['Rodrigo Muñoz',90000000,4],['Camila Torres',70000000,4]]},
+  ];
+  const t = templates[idx-1];
+  const ws = XLSX.utils.aoa_to_sheet([t.headers,...t.data]);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Datos');
+  XLSX.writeFile(wb,t.name);
+}
+</script>
+
+</body>
+</html>
